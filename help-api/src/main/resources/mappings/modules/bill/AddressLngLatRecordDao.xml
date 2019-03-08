@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.bill.dao.AddressLngLatRecordDao">
+    
+	<sql id="addressLngLatRecordColumns">
+		a.id AS "id",
+		a.address AS "address",
+		a.lng AS "lng",
+		a.lat AS "lat"
+	</sql>
+	
+	<sql id="addressLngLatRecordJoins">
+	</sql>
+    
+	<select id="get" resultType="AddressLngLatRecord">
+		SELECT 
+			<include refid="addressLngLatRecordColumns"/>
+		FROM address_lng_lat_record a
+		<include refid="addressLngLatRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<!-- 通过地址查找 -->
+	<select id="getByAdress" resultType="AddressLngLatRecord">
+		SELECT
+			<include refid="addressLngLatRecordColumns"/>
+		FROM address_lng_lat_record a
+			<include refid="addressLngLatRecordJoins"/>
+		WHERE a.address = #{address}
+	</select>
+
+	<select id="findList" resultType="AddressLngLatRecord">
+		SELECT 
+			<include refid="addressLngLatRecordColumns"/>
+		FROM address_lng_lat_record a
+		<include refid="addressLngLatRecordJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="AddressLngLatRecord">
+		SELECT 
+			<include refid="addressLngLatRecordColumns"/>
+		FROM address_lng_lat_record a
+		<include refid="addressLngLatRecordJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO address_lng_lat_record(
+			address,
+			lng,
+			lat
+		) VALUES (
+			#{address},
+			#{lng},
+			#{lat}
+		) ON DUPLICATE KEY UPDATE lng=#{lng},lat=#{lat}
+	</insert>
+	
+	<update id="update">
+		UPDATE address_lng_lat_record 
+		<set> 	
+			<if test="address != null and address != ''">
+				address = #{address},
+			</if>
+			<if test="lng != null and lng != ''">
+				lng = #{lng},
+			</if>
+			<if test="lat != null and lat != ''">
+				lat = #{lat},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM address_lng_lat_record
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

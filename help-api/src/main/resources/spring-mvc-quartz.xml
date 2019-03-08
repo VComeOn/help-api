@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:task="http://www.springframework.org/schema/task"
+        xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.0.xsd
+        http://www.springframework.org/schema/task
+        http://www.springframework.org/schema/task/spring-task-4.0.xsd ">
+
+    <bean id="taskController" class="com.thinkgem.jeesite.modules.task.TaskController"></bean>
+
+    <!-- 开始运输车辆监测，驶出起点时，提醒管理员 -->
+    <!--<bean id="startDeliveryJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        &lt;!&ndash; mySimpleJob 任务POJO &ndash;&gt;
+        <property name="targetObject" ref="taskController" />
+        &lt;!&ndash; 执行run方法 &ndash;&gt;
+        <property name="targetMethod" value="startDelivery" />
+    </bean>
+
+    &lt;!&ndash; 初始延迟1秒,每10分钟运行一次 &ndash;&gt;
+    <bean id="startDeliveryTrigger"  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="jobDetail" ref="startDeliveryJob" />
+        <property name="startDelay" value="1000" />
+        <property name="repeatInterval" value="600000" />
+    </bean>
+
+    &lt;!&ndash; 即将到达监测，到达终点范围时，提醒管理员 &ndash;&gt;
+    <bean id="willArriveJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        &lt;!&ndash; mySimpleJob 任务POJO &ndash;&gt;
+        <property name="targetObject" ref="taskController" />
+        &lt;!&ndash; 执行run方法 &ndash;&gt;
+        <property name="targetMethod" value="willArrive" />
+    </bean>
+
+    &lt;!&ndash; 初始延迟1秒,每10分钟运行一次 &ndash;&gt;
+    <bean id="willArriveTrigger"  class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="jobDetail" ref="startDeliveryJob" />
+        <property name="startDelay" value="1000" />
+        <property name="repeatInterval" value="600000" />
+    </bean>-->
+
+
+    <!-- 调度器工厂bean jobDetails粘合在一起并触发配置Quartz调度器 -->
+    <bean  class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="jobDetails">
+            <list>
+                <!--<ref bean="startDeliveryJob" />
+                <ref bean="willArriveJob" />-->
+            </list>
+        </property>
+
+        <property name="triggers">
+            <list>
+                <!--<ref bean="startDeliveryTrigger" />
+                <ref bean="willArriveTrigger" />-->
+            </list>
+        </property>
+    </bean>
+
+</beans>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.bill.dao.BillConstantDao">
+    
+	<sql id="billConstantColumns">
+		a.id AS "id",
+		a.not_refresh_time AS "notRefreshTime",
+		a.delivery_distance AS "deliveryDistance",
+		a.error_stop_time AS "errorStopTime",
+		a.error_upper AS "errorUpper",
+		a.error_lower AS "errorLower",
+		a.rail_radius AS "railRadius",
+		a.fatigue_drive AS "fatigueDrive"
+	</sql>
+	
+	<sql id="billConstantJoins">
+	</sql>
+    
+	<select id="get" resultType="BillConstant">
+		SELECT 
+			<include refid="billConstantColumns"/>
+		FROM bill_constant a
+		<include refid="billConstantJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BillConstant">
+		SELECT 
+			<include refid="billConstantColumns"/>
+		FROM bill_constant a
+		<include refid="billConstantJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BillConstant">
+		SELECT 
+			<include refid="billConstantColumns"/>
+		FROM bill_constant a
+		<include refid="billConstantJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bill_constant(
+			not_refresh_time,
+			delivery_distance,
+			error_stop_time,
+			error_upper,
+			error_lower,
+			rail_radius,
+			fatigue_drive
+		) VALUES (
+			#{notRefreshTime},
+			#{deliveryDistance},
+			#{errorStopTime},
+			#{errorUpper},
+			#{errorLower},
+			#{railRadius},
+			#{fatigueDrive}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bill_constant 
+		<set> 	
+			<if test="notRefreshTime != null">
+				not_refresh_time = #{notRefreshTime},
+			</if>
+			<if test="deliveryDistance != null and deliveryDistance != ''">
+				delivery_distance = #{deliveryDistance},
+			</if>
+			<if test="errorStopTime != null">
+				error_stop_time = #{errorStopTime},
+			</if>
+			<if test="errorUpper != null and errorUpper != ''">
+				error_upper = #{errorUpper},
+			</if>
+			<if test="errorLower != null and errorLower != ''">
+				error_lower = #{errorLower},
+			</if>
+			<if test="railRadius != null and railRadius != ''">
+				rail_radius = #{railRadius},
+			</if>
+			<if test="fatigueDrive != null">
+				fatigue_drive = #{fatigueDrive},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM bill_constant
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.base.dao.AppVersionDao">
+    
+	<sql id="appVersionColumns">
+		a.id AS "id",
+		a.version AS "version",
+		a.content AS "content"
+	</sql>
+	
+	<select id="get" resultType="AppVersionEntity">
+		SELECT 
+			<include refid="appVersionColumns"/>
+		FROM app_version a
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="AppVersionEntity">
+		SELECT 
+			<include refid="appVersionColumns"/>
+		FROM app_version a
+		<where>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.sort}
+			</when>
+			<otherwise>
+				ORDER BY (case when sort_no is null then 999999  else sort_no end) asc
+			</otherwise>
+		</choose>
+	</select>
+
+</mapper>

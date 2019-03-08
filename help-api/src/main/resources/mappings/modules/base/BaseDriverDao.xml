@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.base.dao.BaseDriverDao">
+    
+	<sql id="baseDriverColumns">
+		a.id AS "id",
+		a.head_img AS "headImg",
+		a.pwd AS "pwd",
+		a.name AS "name",
+		a.phone AS "phone",
+		a.company_id AS "companyId",
+		a.point AS "point",
+		a.point_total AS "pointTotal",
+		a.level AS "level",
+		a.is_on_duty AS "isOnDuty",
+		a.plate_number AS "plateNumber",
+		a.del_flag AS "delFlag",
+		a.last_sign_date AS "lastSignDate",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.status AS "status",
+		a.card_id AS "cardId",
+		a.card_img_a AS "cardImgA",
+		a.card_img_b AS "cardImgB",
+		a.licence_id AS "licenceId",
+		a.licence_img_a AS "licenceImgA",
+		a.licence_img_b AS "licenceImgB",
+		a.certificate_id AS "certificateId",
+		a.certificate_img_a AS "certificateImgA",
+		a.certificate_img_b AS "certificateImgB",
+		b.name as "company.name"
+	</sql>
+	
+	<sql id="baseDriverJoins">
+		left join base_company b on a.company_id=b.id
+	</sql>
+    
+	<!-- 通过手机号获取司机信息 -->
+	<select id="getByPhone" resultType="BaseDriver">
+		SELECT
+		<include refid="baseDriverColumns"/>,
+		(case when (SELECT count(1) FROM driver_message c WHERE c.driver_id=a.id AND c.is_read=0) > 0 THEN 1 ELSE 0 END ) AS 'hasNewMessage'
+		FROM base_driver a
+		<include refid="baseDriverJoins"/>
+		WHERE a.phone=#{phone}  AND a.del_flag=0
+	</select>
+	<!-- app管理端，获取司机状态列表 -->
+	<!--<select id="getDriverStatusList" resultType="DriverVo">
+		SELECT * FROM (
+		(SELECT a.id,
+		a.head_img AS 'headImg',
+		a.name AS 'name',
+		c.name AS 'companyName',
+		NULL AS 'deliveryBillNo',
+		NULL AS 'status',
+		a.is_on_duty AS 'isOnDuty',
+		a.plate_number AS 'plateNumber',
+		'执勤' AS 'label',
+		NULL AS 'deliveryId',
+		a.last_sign_date AS 'deliveryCreateDate'
+		FROM base_driver a LEFT JOIN base_company c ON a.company_id=c.id
+		<where>
+			<if test="companyId != null">
+				a.company_id = #{companyId}
+			</if>
+			AND NOT EXISTS (SELECT b.id FROM bill_delivery b WHERE a.id=b.driver_id AND b.status != 0 AND b.status != 3)
+		</where>
+		)
+		UNION ALL
+		(SELECT a.id,
+		a.head_img AS 'headImg',
+		a.name AS 'name',
+		c.name AS 'companyName',
+		b.delivery_bill_no AS 'deliveryBillNo',
+		b.status AS 'status',
+		a.is_on_duty AS 'isOnDuty',
+		a.plate_number AS 'plateNumber',
+		(CASE WHEN b.id IS NULL AND a.is_on_duty = 1 THEN '执勤'
+		WHEN b.status = 1 THEN '已分配'
+		WHEN b.status = 2 THEN '运输中'
+		WHEN b.status = 3 THEN '已完成'
+		WHEN b.status = 4 THEN '中途停车'
+		WHEN b.status = 5 THEN '运输完成' END ) AS 'label',
+		b.id AS 'deliveryId',
+		b.create_date AS 'deliveryCreateDate'
+		FROM base_driver a LEFT JOIN (SELECT * FROM bill_delivery WHERE `status` != 0
+		<if test="companyId != null">
+			AND company_id = #{companyId}
+		</if>
+		) b
+		ON a.id=b.driver_id LEFT JOIN base_company c ON a.company_id=c.id
+		<where>
+			b.id IS NOT NULL
+			<if test="companyId != null">
+				AND a.company_id = #{companyId}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+
+		</where>
+		)
+		) e
+		<where>
+			<if test="type != null">
+				<choose>
+					&lt;!&ndash; 未分配 &ndash;&gt;
+					<when test="type == 0">
+						AND e.deliveryId IS NULL
+					</when>
+					&lt;!&ndash; 已分配 &ndash;&gt;
+					<when test="type == 1">
+						AND e.status = 1
+					</when>
+					<when test="type == 2">
+						AND e.status IS NOT NULL AND e.status != 1 AND e.status != 3
+					</when>
+				</choose>
+			</if>
+		</where>
+
+		ORDER BY (CASE WHEN e.deliveryId IS NULL THEN 1 ELSE 0 END ) ASC ,e.deliveryCreateDate ASC
+	</select>-->
+
+	<select id="getDriverDetail" resultType="DriverDetailVo">
+		SELECT a.id AS "id",
+		a.head_img AS "headImg",
+		a.name AS "name",
+		a.phone AS "phone",
+		a.company_id AS "companyId",
+		a.is_on_duty AS "isOnDuty",
+		a.plate_number AS "plateNumber",
+		a.last_sign_date AS "lastSignDate",
+		c.name as "companyName",
+		(SELECT case when sum(e.arrive_sign_quantity) is null THEN 0 ELSE sum(e.arrive_sign_quantity) END FROM bill_delivery_sign e WHERE e.delivery_bill_no=#{deliveryBillNo}) AS "arriveSign"
+		<choose>
+			<when test="deliveryBillNo != null and deliveryBillNo != ''">
+				,b.delivery_bill_no AS "delivery.deliveryBillNo",
+				b.lading_bill_no AS "delivery.ladingBillNo",
+				b.status AS "delivery.status",
+				b.sign_quantity AS "delivery.signQuantity",
+				b.sign_date AS "delivery.signDate",
+				b.plate_number AS "delivery.plateNumber",
+				b.create_date AS "delivery.createDate",
+				b.shipper_name AS "delivery.shipperName",
+				b.start_delivery_date AS "delivery.startDeliveryDate",
+				b.end_delivery_date AS "delivery.endDeliveryDate",
+				d.take_mode AS "billLading.takeMode",
+				d.bill_date AS "billLading.billDate",
+				d.storehouse_type AS "billLading.storehouseType",
+				d.customer_name AS "billLading.customerName",
+				d.customer_contact AS "billLading.customerContact",
+				d.customer_phone AS "billLading.customerPhone",
+				d.delivery_address AS "billLading.deliveryAddress",
+				d.storage_name AS "billLading.storageAddress",
+				d.materiel_name AS "billLading.materielName",
+				d.delivery_lng AS "billLading.deliveryLng",
+				d.delivery_lat AS "billLading.deliveryLat",
+				d.arrive_lng AS "billLading.arriveLng",
+				d.arrive_lat AS "billLading.arriveLat"
+
+				/*(CASE WHEN b.status = 1 THEN '已分配'
+				WHEN b.status = 2 THEN '运输中'
+				WHEN b.status = 3 THEN '已完成'
+				WHEN b.status = 4 THEN '中途停车'
+				WHEN b.status = 5 THEN '运输完成' END ) AS 'label'*/
+			</when>
+			<!--<otherwise>
+				(CASE WHEN a.is_on_duty = 1 THEN '执勤' END ) AS 'label'
+			</otherwise>-->
+		</choose>
+		FROM base_driver a
+		<if test="deliveryBillNo != null and deliveryBillNo != ''">
+			LEFT JOIN (SELECT * FROM bill_delivery WHERE delivery_bill_no = #{deliveryBillNo}) b ON a.id=b.driver_id
+			LEFT JOIN bill_lading d ON b.lading_bill_no=d.lading_bill_no
+		</if>
+		LEFT JOIN base_company c ON a.company_id=c.id
+		WHERE a.id=#{driverId}
+	</select>
+
+	<select id="findAllList" resultType="BaseDriver">
+		SELECT 
+			<include refid="baseDriverColumns"/>
+		FROM base_driver a
+		<include refid="baseDriverJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO base_driver(
+			head_img,
+			pwd,
+			name,
+			phone,
+			company_id,
+			point,
+			point_total,
+			level,
+			is_on_duty,
+			plate_number,
+			del_flag,
+			last_sign_date,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status,
+			card_id,
+			card_img_a,
+			card_img_b,
+			licence_id,
+			licence_img_a,
+			licence_img_b,
+			certificate_id,
+			certificate_img_a,
+			certificate_img_b
+		) VALUES (
+			#{headImg},
+			#{pwd},
+			#{name},
+			#{phone},
+			#{companyId},
+			#{point},
+			#{pointTotal},
+			#{level},
+			#{isOnDuty},
+			#{plateNumber},
+			#{delFlag},
+			#{lastSignDate},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{status},
+			#{cardId},
+			#{cardImgA},
+			#{cardImgB},
+			#{licenceId},
+			#{licenceImgA},
+			#{licenceImgB},
+			#{certificateId},
+			#{certificateImgA},
+			#{certificateImgB}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE base_driver 
+		<set> 	
+			<if test="headImg != null and headImg != ''">
+				head_img = #{headImg},
+			</if>
+			<if test="pwd != null and pwd != ''">
+				pwd = #{pwd},
+			</if>
+			<if test="name != null and name != ''">
+				name = #{name},
+			</if>
+			<if test="phone != null and phone != ''">
+				phone = #{phone},
+			</if>
+				company_id = #{companyId},
+			<if test="point != null">
+				point = #{point},
+			</if>
+			<if test="pointTotal != null">
+				point_total = #{pointTotal},
+			</if>
+			<if test="level != null">
+				level = #{level},
+			</if>
+			<if test="isOnDuty != null">
+				is_on_duty = #{isOnDuty},
+			</if>
+			<if test="plateNumber != null and plateNumber != ''">
+				plate_number = #{plateNumber},
+			</if>
+			<if test="delFlag != null and delFlag != ''">
+				del_flag = #{delFlag},
+			</if>
+			<if test="lastSignDate != null and lastSignDate != ''">
+				last_sign_date = #{lastSignDate},
+			</if>
+			<if test="createBy != null and createBy.id != null">
+				create_by = #{createBy.id},
+			</if>
+			<if test="createDate != null and createDate != ''">
+				create_date = #{createDate},
+			</if>
+			<if test="updateBy != null and updateBy.id != null">
+				update_by = #{updateBy.id},
+			</if>
+			<if test="updateDate != null and updateDate != ''">
+				update_date = #{updateDate},
+			</if>
+			<if test="status != null">
+				status = #{status},
+			</if>
+			<if test="cardId != null and cardId != ''">
+				card_id = #{cardId},
+			</if>
+			<if test="cardImgA != null and cardImgA != ''">
+				card_img_a = #{cardImgA},
+			</if>
+			<if test="cardImgB != null and cardImgB != ''">
+				card_img_b = #{cardImgB},
+			</if>
+			<if test="licenceId != null and licenceId != ''">
+				licence_id = #{licenceId},
+			</if>
+			<if test="licenceImgA != null and licenceImgA != ''">
+				licence_img_a = #{licenceImgA},
+			</if>
+			<if test="licenceImgB != null and licenceImgB != ''">
+				licence_img_b = #{licenceImgB},
+			</if>
+			<if test="certificateId != null and certificateId != ''">
+				certificate_id = #{certificateId},
+			</if>
+			<if test="certificateImgA != null and certificateImgA != ''">
+				certificate_img_a = #{certificateImgA},
+			</if>
+			<if test="certificateImgB != null and certificateImgB != ''">
+				certificate_img_b = #{certificateImgB},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE base_driver SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<!-- 绑定或者解绑车辆 -->
+	<update id="bindOrUnbindCar">
+		UPDATE base_driver
+		<set>
+			plate_number=#{plateNumber},is_on_duty=#{isOnDuty}
+		</set>
+		WHERE id=#{id}
+	</update>
+
+	<!-- 二期接口 -->
+	<!--解绑车辆-->
+	<update id="unbindCar">
+		UPDATE base_driver SET
+		plate_number = NULL,
+		is_on_duty = 0
+		WHERE id=#{id}
+	</update>
+	<!-- 管理端二期接口 -->
+
+	<!-- 获取需要审核司机列表 -->
+	<select id="finDriverExamine" resultType="BaseDriver">
+		SELECT
+		<include refid="baseDriverColumns"/>
+		FROM base_driver a
+		<include refid="baseDriverJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND
+			a.status = 0
+			<if test="companyId != null">
+				AND  a.company_id = #{companyId}
+			</if>
+			<if test="companyId == null">
+				AND a.company_id IS NULL
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 通过司机id获取需司机详情 -->
+	<select id="get" resultType="BaseDriver">
+		SELECT
+		<include refid="baseDriverColumns"/>,
+		(case when (SELECT count(1) FROM driver_message c WHERE c.driver_id=a.id AND c.is_read=0) > 0 THEN 1 ELSE 0 END ) AS 'hasNewMessage'
+		FROM base_driver a
+		<include refid="baseDriverJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<!--改变司机驳回通过状态-->
+	<update id="updateStatus">
+		UPDATE base_driver
+		<set>
+			status = #{status}
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<!-- 获取可委托运输任务的司机-->
+	<select id="findList" resultType="BaseDriver">
+		SELECT
+		<include refid="baseDriverColumns"/>
+		FROM base_driver a
+		<include refid="baseDriverJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			and a.status=1
+			<if test="companyId != null">
+				AND a.company_id=${companyId}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="phone != null and phone != ''">
+				AND a.phone LIKE
+				<if test="dbName == 'oracle'">'%'||#{phone}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{phone}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{phone},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 司机看板 -->
+	<!--<select id="getDriverStatusList" resultType="DriverVo">
+		SELECT
+			a.id,
+			a.head_img AS 'headImg',
+			a. NAME AS 'name',
+			c. NAME AS 'companyName',
+			a.plate_number AS 'plateNumber',
+			(
+				CASE
+				WHEN a.is_on_duty = 1 THEN
+					'执勤'
+				ELSE
+					'未执勤'
+				END
+			) AS 'label'
+		FROM
+			base_driver a
+		LEFT JOIN base_company c ON a.company_id = c.id
+		WHERE
+			a.company_id = 3
+		AND
+			a.status = 1
+	</select>-->
+
+	<select id="getDriverStatusList" resultType="DriverVo">
+		SELECT
+			a.id,
+			a.head_img AS 'headImg',
+			a.name AS 'name',
+			b.name AS 'companyName',
+			a.plate_number AS 'plateNumber',
+			a.is_on_duty AS 'isOnDuty'
+		FROM base_driver a
+		<include refid="baseDriverJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			and a.status=1
+			<if test="companyId != null">
+				AND a.company_id=${companyId}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<update id="updateDuty">
+		UPDATE base_driver
+		<set>
+			<if test="isOnDuty != null">
+				is_on_duty = #{isOnDuty},
+			</if>
+			<if test="plateNumber != null and plateNumber != ''">
+				plate_number = #{plateNumber},
+			</if>
+			<if test="lastSignDate != null and lastSignDate != ''">
+				last_sign_date = #{lastSignDate},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+</mapper>

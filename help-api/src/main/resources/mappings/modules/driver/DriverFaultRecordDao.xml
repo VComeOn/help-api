@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.driver.dao.DriverFaultRecordDao">
+    
+	<sql id="driverFaultRecordColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.content AS "content",
+		a.img_urls AS "imgUrls",
+		a.driver_id AS "driverId",
+		a.delivery_bill_no AS "deliveryBillNo",
+		a.lading_bill_no AS "ladingBillNo",
+		a.company_id AS "companyId",
+		a.create_date AS "createDate",
+		a.address AS "address"
+	</sql>
+	
+	<sql id="driverFaultRecordJoins">
+	</sql>
+    
+	<select id="get" resultType="DriverFaultRecord">
+		SELECT 
+			<include refid="driverFaultRecordColumns"/>
+		FROM driver_fault_record a
+		<include refid="driverFaultRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<!-- 获取运单异常停车的次数 -->
+	<select id="countRecordByDelivery" resultType="int">
+		SELECT count(1) FROM driver_fault_record WHERE a.delivery_bill_no=#{deliveryBillNo}
+	</select>
+	
+	<select id="findList" resultType="DriverFaultRecord">
+		SELECT 
+			<include refid="driverFaultRecordColumns"/>
+		FROM driver_fault_record a
+		<include refid="driverFaultRecordJoins"/>
+		<where>
+			
+			<if test="driverId != null and driverId != ''">
+				AND a.driver_id = #{driverId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="DriverFaultRecord">
+		SELECT 
+			<include refid="driverFaultRecordColumns"/>
+		FROM driver_fault_record a
+		<include refid="driverFaultRecordJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO driver_fault_record(
+			type,
+			content,
+			img_urls,
+			driver_id,
+			delivery_bill_no,
+			lading_bill_no,
+			company_id,
+			create_date,
+			address
+		) VALUES (
+			#{type},
+			#{content},
+			#{imgUrls},
+			#{driverId},
+			#{deliveryBillNo},
+			#{ladingBillNo},
+			#{companyId},
+			#{createDate},
+			#{address}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE driver_fault_record 
+		<set> 	
+			<if test="type != null">
+				type = #{type},
+			</if>
+			<if test="content != null and content != ''">
+				content = #{content},
+			</if>
+			<if test="imgUrls != null and imgUrls != ''">
+				img_urls = #{imgUrls},
+			</if>
+			<if test="driverId != null">
+				driver_id = #{driverId},
+			</if>
+			<if test="deliveryBillNo != null and deliveryBillNo != ''">
+				delivery_bill_no = #{deliveryBillNo},
+			</if>
+			<if test="ladingBillNo != null and ladingBillNo != ''">
+				lading_bill_no = #{ladingBillNo},
+			</if>
+			<if test="companyId != null">
+				company_id = #{companyId},
+			</if>
+			<if test="createDate != null and createDate != ''">
+				create_date = #{createDate},
+			</if>
+			<if test="address != null and address != ''">
+				address = #{address},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM driver_fault_record
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

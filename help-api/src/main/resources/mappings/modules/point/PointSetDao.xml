@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.point.dao.PointSetDao">
+    
+	<sql id="pointSetColumns">
+		a.id AS "id",
+		a.star_one AS "starOne",
+		a.star_two AS "starTwo",
+		a.star_three AS "starThree",
+		a.star_four AS "starFour",
+		a.star_five AS "starFive",
+		a.error_stop AS "errorStop",
+		a.no_error_stop AS "noErrorStop",
+		a.arrive AS "arrive",
+		a.late AS "late",
+		a.close_app AS "closeApp",
+		a.open_app AS "openApp",
+		a.send_point AS "sendPoint",
+		a.update_time AS "updateTime",
+		a.update_by AS "updateBy.id"
+	</sql>
+	
+	<sql id="pointSetJoins">
+	</sql>
+    
+	<select id="get" resultType="PointSet">
+		SELECT 
+			<include refid="pointSetColumns"/>
+		FROM point_set a
+		<include refid="pointSetJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PointSet">
+		SELECT 
+			<include refid="pointSetColumns"/>
+		FROM point_set a
+		<include refid="pointSetJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PointSet">
+		SELECT 
+			<include refid="pointSetColumns"/>
+		FROM point_set a
+		<include refid="pointSetJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO point_set(
+			star_one,
+			star_two,
+			star_three,
+			star_four,
+			star_five,
+			error_stop,
+			no_error_stop,
+			arrive,
+			late,
+			close_app,
+			open_app,
+			send_point,
+			update_time,
+			update_by
+		) VALUES (
+			#{starOne},
+			#{starTwo},
+			#{starThree},
+			#{starFour},
+			#{starFive},
+			#{errorStop},
+			#{noErrorStop},
+			#{arrive},
+			#{late},
+			#{closeApp},
+			#{openApp},
+			#{sendPoint},
+			#{updateTime},
+			#{updateBy.id}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE point_set 
+		<set> 	
+				star_one = #{starOne},
+				star_two = #{starTwo},
+				star_three = #{starThree},
+				star_four = #{starFour},
+				star_five = #{starFive},
+				error_stop = #{errorStop},
+				no_error_stop = #{noErrorStop},
+				arrive = #{arrive},
+				late = #{late},
+				close_app = #{closeApp},
+				open_app = #{openApp},
+				send_point = #{sendPoint},
+				update_time = #{updateTime},
+				update_by = #{updateBy.id},
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM point_set
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

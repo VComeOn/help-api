@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.approve.dao.ApproveHistoryDao">
+    
+	<sql id="approveHistoryColumns">
+		a.id AS "id",
+		a.sys_user_id AS "sysUserId",
+		a.type AS "type",
+		a.status AS "status",
+		a.remark AS "remark",
+		a.create_time AS "createTime"
+	</sql>
+	
+	<sql id="approveHistoryJoins">
+	</sql>
+    
+	<select id="get" resultType="ApproveHistory">
+		SELECT 
+			<include refid="approveHistoryColumns"/>
+		FROM approve_history a
+		<include refid="approveHistoryJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="ApproveHistory">
+		SELECT 
+			<include refid="approveHistoryColumns"/>
+		FROM approve_history a
+		<include refid="approveHistoryJoins"/>
+		<where>
+			<if test="sysUserId != null">
+				AND a.sys_user_id=#{sysUserId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="ApproveHistory">
+		SELECT 
+			<include refid="approveHistoryColumns"/>
+		FROM approve_history a
+		<include refid="approveHistoryJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO approve_history(
+			sys_user_id,
+			type,
+			status,
+			remark,
+			create_time
+		) VALUES (
+			#{sysUserId},
+			#{type},
+			#{status},
+			#{remark},
+			#{createTime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE approve_history 
+		<set> 	
+			<if test="sysUserId != null">
+				sys_user_id = #{sysUserId},
+			</if>
+			<if test="type != null">
+				type = #{type},
+			</if>
+			<if test="status != null">
+				status = #{status},
+			</if>
+			<if test="remark != null and remark != ''">
+				remark = #{remark},
+			</if>
+			<if test="createTime != null and createTime != ''">
+				create_time = #{createTime},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM approve_history
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

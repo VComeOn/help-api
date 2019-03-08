@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.sys.dao.UserDao">
+	
+    <sql id="userColumns">
+    	a.id,
+    	a.login_name,
+    	a.password AS "password",
+    	a.role_id AS "roleId",
+		a.name,
+		a.head_img AS "headImg",
+		a.phone,
+		a.login_ip,
+		a.login_date,
+		a.remarks,
+		a.login_flag,
+		a.company_id,
+		a.create_by AS "createBy.id",
+		a.create_date,
+		a.update_by AS "updateBy.id",
+		a.update_date,
+		a.del_flag,
+		a.department,
+		a.push_type,
+		b.name AS "roleName",
+		b.role_type AS "roleType",
+		c.name as "companyName"
+    </sql>
+    
+    <sql id="userJoins">
+		left join sys_role b on a.role_id=b.id
+		left join base_company c on a.company_id=c.id
+    </sql>
+	
+	<!-- 根据编号获得用户 -->
+	<select id="get" resultType="User">
+		SELECT
+			<include refid="userColumns"/>,
+		(case when (SELECT count(1) FROM user_message c WHERE c.user_id=a.id AND c.is_read=0) > 0 THEN 1 ELSE 0 END ) AS 'hasNewMessage'
+		FROM sys_user a
+		<include refid="userJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 根据登录名查询用户 -->
+	<select id="getByLoginName" resultType="User" parameterType="User">
+		SELECT
+			<include refid="userColumns"/>
+		FROM sys_user a
+		<include refid="userJoins"/>
+		WHERE a.login_name = #{loginName} AND a.del_flag = #{DEL_FLAG_NORMAL}
+	</select>
+
+	<!-- 通过帐号或者手机号查询用户 -->
+	<select id="getByPhoneOrAccount" resultType="User">
+		SELECT
+			<include refid="userColumns"/>,
+		(case when (SELECT count(1) FROM user_message c WHERE c.user_id=a.id AND c.is_read=0) > 0 THEN 1 ELSE 0 END ) AS 'hasNewMessage'
+		FROM sys_user a
+			<include refid="userJoins"/>
+		WHERE (a.login_name = #{account} OR a.phone=#{account}) AND a.del_flag = 0
+	</select>
+
+	<!-- 通过手机号查询用户 -->
+	<select id="getByPhone" resultType="User">
+		SELECT
+		<include refid="userColumns"/>
+		FROM sys_user a
+		<include refid="userJoins"/>
+		WHERE a.phone=#{account} AND a.del_flag = 0
+	</select>
+	
+	<!-- 分页查询用户信息 -->
+	<select id="findList" resultType="User">
+		SELECT
+			<include refid="userColumns"/>
+		FROM sys_user a
+		<include refid="userJoins"/>
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+		<if test="companyId != null">
+			and a.company_id=#{companyId}
+		</if>
+		<if test="name != null and name != ''">
+			AND a.name LIKE 
+				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+		</if>
+		<if test="loginName != null and loginName != ''">
+			AND a.login_name LIKE 
+				<if test="dbName == 'oracle'">'%'||#{loginName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{loginName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{loginName},'%')</if>
+		</if>
+		<!-- 如果不是超级管理员，则不显示超级管理员用户 -->
+		<if test="!currentUser.admin">
+			AND a.id != '1'
+		</if>
+		<!-- 数据范围过滤 -->
+		${sqlMap.dsf}
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.id
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 获取所有公司管理员 -->
+	<select id="getAllManager" resultType="User">
+		SELECT <include refid="userColumns"/>
+		FROM sys_user a
+		<include refid="userJoins"/>
+		WHERE a.del_flag=0 AND ((a.company_id=#{companyId} AND a.role_id=3) OR a.role_id=2)
+		<!-- 后台账号为（人事部30005、行政部30004、物流管理中心30002、管理300），无需按部门筛选推送消息 -->
+		<if test="department != null and department != '' and department != '30005' and department != '30004' and department != '30002' and department != '300'">
+			AND (CASE WHEN a.role_id=2 THEN a.department = #{department} ELSE TRUE END )
+		</if>
+	</select>
+
+	<!-- 查询全部用户 -->
+	<select id="findAllList" resultType="User">
+		SELECT
+			<include refid="userColumns"/>
+		FROM sys_user a
+		<include refid="userJoins"/>
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+		ORDER BY c.code, o.code, a.name
+	</select>
+	
+	<!-- 查询全部用户数目 -->
+	<select id="findAllCount" resultType="long">
+		SELECT
+			COUNT(1)
+		FROM sys_user a
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+	</select>
+	
+
+	<!-- 更新用户 -->
+	<update id="update">
+		UPDATE sys_user 
+		<set> 	
+			<if test="name != null and name != ''">
+				name = #{name},
+			</if>
+			<if test="loginName != null and loginName != ''">
+				login_name = #{loginName},
+			</if>
+			<if test="password != null and password != ''">
+				password = #{password},
+			</if>
+			<if test="headImg != null and headImg != ''">
+				head_img = #{headImg},
+			</if>
+			<if test="phone != null and phone != ''">
+				phone = #{phone},
+			</if>
+			<if test="loginIp != null and loginIp != ''">
+				login_ip = #{loginIp},
+			</if>
+			<if test="loginDate != null and loginDate != ''">
+				login_date = #{loginDate},
+			</if>
+			<if test="loginFlag != null and loginFlag != ''">
+				login_flag = #{loginFlag},
+			</if>
+			<if test="createBy != null and createBy.id != null">
+				create_by = #{createBy.id},
+			</if>
+			<if test="createDate != null">
+				create_date = #{createDate},
+			</if>
+			<if test="updateBy != null and updateBy.id != null">
+				update_by = #{updateBy.id},
+			</if>
+			<if test="updateDate != null">
+				update_date = #{updateDate},
+			</if>
+			<if test="remarks != null and remarks != ''">
+				remarks = #{remarks},
+			</if>
+			<if test="delFlag != null and delFlag != ''">
+				del_flag = #{delFlag},
+			</if>
+			<if test="companyId != null">
+				company_id=#{companyId},
+			</if>
+			<if test="department != null and department != ''">
+				department=#{department},
+			</if>
+			<if test="pushType != null">
+				push_type=#{pushType},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 删除用户和角色关联表数据 -->
+	<delete id="deleteUserRole">
+		DELETE FROM sys_user_role WHERE user_id = #{id}
+	</delete>
+	
+	<!-- 插入用户和角色关联表数据 -->
+	<insert id="insertUserRole">
+		INSERT INTO sys_user_role(user_id, role_id)
+		<foreach collection="roleList" item="role" separator=" union all ">
+			SELECT #{id}, #{role.id}
+			<if test="dbName != 'mssql'">
+			FROM dual
+			</if>
+		</foreach>
+	</insert>
+	
+	<!-- 更新用户信息  -->
+	<update id="updateUserInfo">
+		UPDATE sys_user
+		<set>
+			phone = #{phone},
+			update_date = #{updateDate},
+			name = #{name}
+			<if test="headImg != null and headImg != ''">
+				,head_img = #{headImg}
+			</if>
+		</set>
+
+		WHERE id = #{id}
+	</update>
+
+	<!-- 设置推送方式 -->
+	<update id="updatePushType">
+		UPDATE sys_user SET
+		push_type = #{pushType}
+		WHERE id = #{id}
+	</update>
+
+	<!-- 更新用户密码 -->
+	<update id="updatePasswordById">
+		UPDATE sys_user SET 
+			password = #{password} 
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 更新登录信息，如登录IP、登录时间 -->
+	<update id="updateLoginInfo">
+		UPDATE sys_user SET 
+			login_ip = #{loginIp}, 
+			login_Date = #{loginDate} 
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 逻辑删除用户 -->
+	<update id="delete">
+		UPDATE sys_user SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

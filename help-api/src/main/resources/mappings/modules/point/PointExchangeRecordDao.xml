@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.point.dao.PointExchangeRecordDao">
+    
+	<sql id="pointExchangeRecordColumns">
+		a.id AS "id",
+		a.driver_id AS "driverId",
+		a.mall_id AS "mallId",
+		a.apply_date AS "applyDate",
+		a.status AS "status",
+		a.examine_date AS "examineDate",
+		a.admin_id AS "adminId",
+		a.card_no AS "cardNo",
+		a.card_pwd AS "cardPwd",
+		a.reason AS "reason",
+		b.title as "mallTitle"
+	</sql>
+	
+	<sql id="pointExchangeRecordJoins">
+		left join point_mall b on a.mall_id=b.id
+	</sql>
+    
+	<select id="get" resultType="PointExchangeRecord">
+		SELECT 
+			<include refid="pointExchangeRecordColumns"/>
+		FROM point_exchange_record a
+		<include refid="pointExchangeRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<!-- 获取积分兑换成功后的详情 -->
+	<select id="getDetail" resultType="PointExchangeRecordVo">
+		SELECT a.id AS "id",
+		a.driver_id AS "driverId",
+		a.apply_date AS "applyDate",
+		a.card_no AS "cardNo",
+		a.card_pwd AS "cardPwd",
+		a.reason AS "reason",
+		b.title AS "vo.title",
+		b.img_url AS "vo.imgUrl",
+		b.introduce AS "vo.introduce",
+		b.point_num AS "vo.pointNum"
+		FROM point_exchange_record a
+		<include refid="pointExchangeRecordJoins"/>
+		WHERE a.id = #{id} AND a.status=1
+	</select>
+	
+	<select id="findList" resultType="PointExchangeRecord">
+		SELECT 
+			<include refid="pointExchangeRecordColumns"/>
+		FROM point_exchange_record a
+		<include refid="pointExchangeRecordJoins"/>
+		<where>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="driverId != null">
+				AND a.driver_id = #{driverId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.apply_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PointExchangeRecord">
+		SELECT 
+			<include refid="pointExchangeRecordColumns"/>
+		FROM point_exchange_record a
+		<include refid="pointExchangeRecordJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO point_exchange_record(
+			driver_id,
+			mall_id,
+			apply_date,
+			status,
+			examine_date,
+			admin_id,
+			card_no,
+			card_pwd,
+			reason
+		) VALUES (
+			#{driverId},
+			#{mallId},
+			#{applyDate},
+			#{status},
+			#{examineDate},
+			#{adminId},
+			#{cardNo},
+			#{cardPwd},
+			#{reason}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE point_exchange_record 
+		<set> 	
+			<if test="driverId != null">
+				driver_id = #{driverId},
+			</if>
+			<if test="mallId != null">
+				mall_id = #{mallId},
+			</if>
+			<if test="applyDate != null and applyDate != ''">
+				apply_date = #{applyDate},
+			</if>
+			<if test="status != null">
+				status = #{status},
+			</if>
+			<if test="examineDate != null">
+				examine_date = #{examineDate},
+			</if>
+			<if test="adminId != null">
+				admin_id = #{adminId},
+			</if>
+			<if test="cardNo != null and cardNo != ''">
+				card_no = #{cardNo},
+			</if>
+			<if test="cardPwd != null and cardPwd != ''">
+				card_pwd = #{cardPwd},
+			</if>
+			<if test="reason != null and reason != ''">
+				reason = #{reason},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM point_exchange_record
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

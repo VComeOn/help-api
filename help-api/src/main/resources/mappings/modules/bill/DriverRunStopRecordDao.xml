@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.bill.dao.DriverRunStopRecordDao">
+    
+	<sql id="driverRunStopRecordColumns">
+		a.id AS "id",
+		a.delivery_bill_id AS "deliveryBillId",
+		a.run_time AS "runTime",
+		a.stop_time AS "stopTime",
+		a.driver_id AS "driverId",
+		a.company_id AS "companyId",
+		a.lading_bill_no AS "ladingBillNo"
+	</sql>
+	
+	<sql id="driverRunStopRecordJoins">
+	</sql>
+    
+	<select id="get" resultType="DriverRunStopRecord">
+		SELECT 
+			<include refid="driverRunStopRecordColumns"/>
+		FROM driver_run_stop_record a
+		<include refid="driverRunStopRecordJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="DriverRunStopRecord">
+		SELECT 
+			<include refid="driverRunStopRecordColumns"/>
+		FROM driver_run_stop_record a
+		<include refid="driverRunStopRecordJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="DriverRunStopRecord">
+		SELECT 
+			<include refid="driverRunStopRecordColumns"/>
+		FROM driver_run_stop_record a
+		<include refid="driverRunStopRecordJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO driver_run_stop_record(
+			delivery_bill_id,
+			run_time,
+			stop_time,
+			driver_id,
+			company_id,
+			lading_bill_no
+		) VALUES (
+			#{deliveryBillId},
+			#{runTime},
+			#{stopTime},
+			#{driverId},
+			#{companyId},
+			#{ladingBillNo}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE driver_run_stop_record 
+		<set> 	
+			<if test="deliveryBillId != null">
+				delivery_bill_id = #{deliveryBillId},
+			</if>
+			<if test="runTime != null and runTime != ''">
+				run_time = #{runTime},
+			</if>
+			<if test="stopTime != null and stopTime != ''">
+				stop_time = #{stopTime},
+			</if>
+			<if test="driverId != null">
+				driver_id = #{driverId},
+			</if>
+			<if test="companyId != null">
+				company_id = #{companyId},
+			</if>
+			<if test="ladingBillNo != null">
+				lading_bill_no = #{ladingBillNo},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM driver_run_stop_record
+		WHERE id = #{id}
+	</update>
+	<!--            二期接口             -->
+	<!-- 获取该运单的最后一条启停记录 -->
+	<select id="getLastRecordByDeliveryNo" resultType="DriverRunStopRecord">
+		SELECT
+		<include refid="driverRunStopRecordColumns"/>
+		FROM driver_run_stop_record a
+		<include refid="driverRunStopRecordJoins"/>
+		WHERE a.delivery_bill_id=#{deliveryBillId} ORDER BY a.run_time desc limit 1
+	</select>
+</mapper>

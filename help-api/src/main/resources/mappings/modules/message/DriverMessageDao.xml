@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.message.dao.DriverMessageDao">
+    
+	<sql id="driverMessageColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.driver_id AS "driverId",
+		a.title AS "title",
+		a.content AS "content",
+		a.create_date AS "createDate",
+		a.admin_id AS "adminId",
+		a.admin_batch AS "adminBatch",
+		a.is_read AS "isRead"
+	</sql>
+	
+	<sql id="driverMessageJoins">
+
+	</sql>
+    
+	<select id="get" resultType="DriverMessage">
+		SELECT 
+			<include refid="driverMessageColumns"/>
+		FROM driver_message a
+		<include refid="driverMessageJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="DriverMessage">
+		SELECT 
+			<include refid="driverMessageColumns"/>
+		FROM driver_message a
+		<include refid="driverMessageJoins"/>
+		<where>
+			<if test="type != null">
+				AND a.type = #{type}
+			</if>
+			<if test="driverId != null">
+				AND a.driver_id = #{driverId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="DriverMessage">
+		SELECT 
+			<include refid="driverMessageColumns"/>
+		FROM driver_message a
+		<include refid="driverMessageJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO driver_message(
+			type,
+			driver_id,
+			title,
+			content,
+			create_date,
+			admin_id,
+			admin_batch,
+			is_read
+		) VALUES (
+			#{type},
+			#{driverId},
+			#{title},
+			#{content},
+			#{createDate},
+			#{adminId},
+			#{adminBatch},
+			#{isRead}
+		)
+	</insert>
+
+	<insert id="insertList" parameterType="list">
+		INSERT INTO driver_message(
+			type,
+			driver_id,
+			title,
+			content,
+			create_date,
+			admin_id,
+			admin_batch,
+			is_read
+		) VALUES
+		<foreach collection="list" item="item" separator=",">
+			(
+			#{item.type},
+			#{item.driverId},
+			#{item.title},
+			#{item.content},
+			#{item.createDate},
+			#{item.adminId},
+			#{item.adminBatch},
+			#{item.isRead}
+			)
+		</foreach>
+	</insert>
+
+	<update id="update">
+		UPDATE driver_message 
+		<set> 	
+			<if test="type != null">
+				type = #{type},
+			</if>
+			<if test="driverId != null">
+				driver_id = #{driverId},
+			</if>
+			<if test="title != null and title != ''">
+				title = #{title},
+			</if>
+			<if test="content != null and content != ''">
+				content = #{content},
+			</if>
+			<if test="createDate != null and createDate != ''">
+				create_date = #{createDate},
+			</if>
+			<if test="adminId != null">
+				admin_id = #{adminId},
+			</if>
+			<if test="adminBatch != null and adminBatch != ''">
+				admin_batch = #{adminBatch},
+			</if>
+			<if test="isRead != null">
+				is_read = #{isRead},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<update id="setRead">
+		UPDATE driver_message
+		<set>
+			is_read = 1
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM driver_message
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

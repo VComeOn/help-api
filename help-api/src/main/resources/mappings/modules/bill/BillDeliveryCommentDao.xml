@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.bill.dao.BillDeliveryCommentDao">
+    
+	<sql id="billDeliveryCommentColumns">
+		a.id AS "id",
+		a.delivery_id AS "deliveryId",
+		a.satisfaction_score AS "satisfactionScore",
+		a.safe_score AS "safeScore",
+		a.customer_score AS "customerScore",
+		a.satisfaction_comment AS "satisfactionComment",
+		a.safe_comment AS "safeComment",
+		a.customer_comment AS "customerComment",
+		a.satisfaction_time AS "satisfactionTime",
+		a.safe_time AS "safeTime",
+		a.customer_time AS "customerTime"
+	</sql>
+	
+	<sql id="billDeliveryCommentJoins">
+	</sql>
+    
+	<select id="get" resultType="BillDeliveryComment">
+		SELECT 
+			<include refid="billDeliveryCommentColumns"/>
+		FROM bill_delivery_comment a
+		<include refid="billDeliveryCommentJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<!-- 通过运单id获取评论信息 -->
+	<select id="getByDeliveryId" resultType="BillDeliveryComment">
+		SELECT
+		<include refid="billDeliveryCommentColumns"/>
+		FROM bill_delivery_comment a
+		<include refid="billDeliveryCommentJoins"/>
+		WHERE a.delivery_id = #{deliveryId}
+	</select>
+	
+	<select id="findList" resultType="BillDeliveryComment">
+		SELECT 
+			<include refid="billDeliveryCommentColumns"/>
+		FROM bill_delivery_comment a
+		<include refid="billDeliveryCommentJoins"/>
+		<where>
+			
+			<if test="deliveryId != null and deliveryId != ''">
+				AND a.delivery_id = #{deliveryId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BillDeliveryComment">
+		SELECT 
+			<include refid="billDeliveryCommentColumns"/>
+		FROM bill_delivery_comment a
+		<include refid="billDeliveryCommentJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bill_delivery_comment(
+			delivery_id,
+			satisfaction_score,
+			safe_score,
+			customer_score,
+			satisfaction_comment,
+			safe_comment,
+			customer_comment,
+			satisfaction_time,
+			safe_time,
+			customer_time
+		) VALUES (
+			#{deliveryId},
+			#{satisfactionScore},
+			#{safeScore},
+			#{customerScore},
+			#{satisfactionComment},
+			#{safeComment},
+			#{customerComment},
+			#{satisfactionTime},
+			#{safeTime},
+			#{customerTime}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bill_delivery_comment 
+		<set> 	
+			<if test="deliveryId != null">
+				delivery_id = #{deliveryId},
+			</if>
+			<if test="satisfactionScore != null">
+				satisfaction_score = #{satisfactionScore},
+			</if>
+			<if test="safeScore != null">
+				safe_score = #{safeScore},
+			</if>
+			<if test="customerScore != null">
+				customer_score = #{customerScore},
+			</if>
+			<if test="satisfactionComment != null and satisfactionComment != ''">
+				satisfaction_comment = #{satisfactionComment},
+			</if>
+			<if test="safeComment != null and safeComment != ''">
+				safe_comment = #{safeComment},
+			</if>
+			<if test="customerComment != null and customerComment != ''">
+				customer_comment = #{customerComment},
+			</if>
+			<if test="satisfactionTime != null and satisfactionTime != ''">
+				satisfaction_time = #{satisfactionTime},
+			</if>
+			<if test="safeTime != null and safeTime != ''">
+				safe_time = #{safeTime},
+			</if>
+			<if test="customerTime != null and customerTime != ''">
+				customer_time = #{customerTime},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM bill_delivery_comment
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

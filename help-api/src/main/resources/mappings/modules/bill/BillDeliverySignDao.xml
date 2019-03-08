@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.bill.dao.BillDeliverySignDao">
+    
+	<sql id="billDeliverySignColumns">
+		a.id AS "id",
+		a.delivery_bill_no AS "deliveryBillNo",
+		a.lading_bill_no AS "ladingBillNo",
+		a.arrive_sign_quantity AS "arriveSignQuantity",
+		a.arrive_sign_date AS "arriveSignDate",
+		a.driver_id AS "driverId",
+		a.plate_number AS "plateNumber",
+		a.arrive_sign_photo AS "arriveSignPhoto",
+		a.arrive_sign_remark AS "arriveSignRemark",
+		a.arrive_sign_type AS "arriveSignType"
+	</sql>
+	
+	<sql id="billDeliverySignJoins">
+	</sql>
+    
+	<select id="get" resultType="BillDeliverySign">
+		SELECT 
+			<include refid="billDeliverySignColumns"/>
+		FROM bill_delivery_sign a
+		<include refid="billDeliverySignJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="BillDeliverySign">
+		SELECT 
+			<include refid="billDeliverySignColumns"/>
+		FROM bill_delivery_sign a
+		<include refid="billDeliverySignJoins"/>
+		<where>
+			<if test="deliveryBillNo != null and deliveryBillNo != ''">
+				AND a.delivery_bill_no = #{deliveryBillNo}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="BillDeliverySign">
+		SELECT 
+			<include refid="billDeliverySignColumns"/>
+		FROM bill_delivery_sign a
+		<include refid="billDeliverySignJoins"/>
+		<where>
+			<if test="deliveryBillNo != null and deliveryBillNo != ''">
+				AND a.delivery_bill_no = #{deliveryBillNo}
+			</if>
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bill_delivery_sign(
+			delivery_bill_no,
+			lading_bill_no,
+			arrive_sign_quantity,
+			arrive_sign_date,
+			driver_id,
+			plate_number,
+			arrive_sign_photo,
+			arrive_sign_remark,
+			arrive_sign_type
+		) VALUES (
+			#{deliveryBillNo},
+			#{ladingBillNo},
+			#{arriveSignQuantity},
+			#{arriveSignDate},
+			#{driverId},
+			#{plateNumber},
+			#{arriveSignPhoto},
+			#{arriveSignRemark},
+			#{arriveSignType}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE bill_delivery_sign 
+		<set> 	
+			<if test="deliveryBillNo != null and deliveryBillNo != ''">
+				delivery_bill_no = #{deliveryBillNo},
+			</if>
+			<if test="ladingBillNo != null and ladingBillNo != ''">
+				lading_bill_no = #{ladingBillNo},
+			</if>
+			<if test="arriveSignQuantity != null and arriveSignQuantity != ''">
+				arrive_sign_quantity = #{arriveSignQuantity},
+			</if>
+			<if test="arriveSignDate != null and arriveSignDate != ''">
+				arrive_sign_date = #{arriveSignDate},
+			</if>
+			<if test="driverId != null">
+				driver_id = #{driverId},
+			</if>
+			<if test="plateNumber != null and plateNumber != ''">
+				plate_number = #{plateNumber},
+			</if>
+			<if test="arriveSignPhoto != null and arriveSignPhoto != ''">
+				arrive_sign_photo = #{arriveSignPhoto},
+			</if>
+			<if test="arriveSignRemark != null and arriveSignRemark != ''">
+				arrive_sign_remark = #{arriveSignRemark},
+			</if>
+			<if test="arriveSignType != null">
+				arrive_sign_type = #{arriveSignType},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM bill_delivery_sign
+		WHERE id = #{id}
+	</update>
+
+	<select id="findListBybillDeliveryNoAndPlate" resultType="BillDeliverySign">
+		SELECT
+		<include refid="billDeliverySignColumns"/>
+		FROM bill_delivery_sign a
+		<include refid="billDeliverySignJoins"/>
+		<where>
+			   a.delivery_bill_no = #{deliveryBillNo} and a.driver_id=#{driverId} and a.plate_number=#{plateNumber}
+		</where>
+		ORDER BY a.arrive_sign_date DESC
+	</select>
+</mapper>

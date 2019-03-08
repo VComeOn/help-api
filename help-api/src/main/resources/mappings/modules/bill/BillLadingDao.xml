@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.bill.dao.BillLadingDao">
+    
+	<sql id="billLadingColumns">
+		a.id AS "id",
+		a.department AS "department",
+		a.lading_bill_no AS "ladingBillNo",
+		a.organization_name AS "organizationName",
+		a.status AS "status",
+		a.take_mode AS "takeMode",
+		a.bill_date AS "billDate",
+		a.storehouse_type AS "storehouseType",
+		a.company_id AS "companyId",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.customer_name AS "customerName",
+		a.customer_contact AS "customerContact",
+		a.customer_phone AS "customerPhone",
+		a.delivery_address AS "deliveryAddress",
+		a.latest_lading_time AS "latestLadingTime",
+		a.latest_arrive_time AS "latestArriveTime",
+		a.remark AS "remark",
+		a.storage_name AS "storageName",
+		a.storage_address AS "storageAddress",
+		a.materiel_name AS "materielName",
+		a.total_volume AS "totalVolume",
+		a.customer_loss_rate AS "customerLossRate",
+		a.freight_price AS "freightPrice",
+		a.delivery_lng AS "deliveryLng",
+		a.delivery_lat AS "deliveryLat",
+		a.arrive_lng AS "arriveLng",
+		a.arrive_lat AS "arriveLat",
+		a.start_rail_radius AS "startRailRadius",
+		a.end_rail_radius AS "endRailRadius",
+		a.bill_secret AS "billSecret",
+		a.ti_dan_hao AS "tiDanHao",
+		a.zi_ti_dan_hao AS "ziTiDanHao"
+	</sql>
+	
+	<sql id="billLadingJoins">
+	</sql>
+
+	<select id="findAllList" resultType="BillLading">
+		SELECT 
+			<include refid="billLadingColumns"/>
+		FROM bill_lading a
+		<include refid="billLadingJoins"/>
+		<where>
+			<if test="status != null">
+				AND a.status = #{status}
+			</if>
+			<if test="storehouseType != null">
+				AND a.storehouse_type = #{storehouseType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO bill_lading(
+			ti_dan_hao,
+			zi_ti_dan_hao,
+			lading_bill_no,
+			bill_secret,
+			department,
+			organization_name,
+			status,
+			take_mode,
+			bill_date,
+			storehouse_type,
+			company_id,
+			company_code,
+			company_name,
+			customer_name,
+			customer_contact,
+			customer_phone,
+			delivery_address,
+			latest_lading_time,
+			latest_arrive_time,
+			remark,
+			storage_name,
+			storage_address,
+			materiel_name,
+			total_volume,
+			customer_loss_rate,
+			freight_price,
+			delivery_lng,
+			delivery_lat,
+			arrive_lng,
+			arrive_lat,
+			start_rail_radius,
+			end_rail_radius
+
+		) VALUES (
+			#{tiDanHao},
+			#{ziTiDanHao},
+			#{ladingBillNo},
+			#{billSecret},
+			#{department},
+			#{organizationName},
+			#{status},
+			#{takeMode},
+			#{billDate},
+			#{storehouseType},
+			#{companyId},
+			#{companyCode},
+			#{companyName},
+			#{customerName},
+			#{customerContact},
+			#{customerPhone},
+			#{deliveryAddress},
+			#{latestLadingTime},
+			#{latestArriveTime},
+			#{remark},
+			#{storageName},
+			#{storageAddress},
+			#{materielName},
+			#{totalVolume},
+			#{customerLossRate},
+			#{freightPrice},
+			#{deliveryLng},
+			#{deliveryLat},
+			#{arriveLng},
+			#{arriveLat},
+			#{startRailRadius},
+			#{endRailRadius}
+
+		)
+	</insert>
+	
+	<insert id="insertList" parameterType="list">
+		INSERT INTO bill_lading(
+			ti_dan_hao,
+			zi_ti_dan_hao,
+			lading_bill_no,
+			bill_secret,
+			department,
+			organization_name,
+			status,
+			take_mode,
+			bill_date,
+			storehouse_type,
+			company_id,
+			company_code,
+			company_name,
+			customer_name,
+			customer_contact,
+			customer_phone,
+			delivery_address,
+			latest_lading_time,
+			latest_arrive_time,
+			remark,
+			storage_name,
+			storage_address,
+			materiel_name,
+			total_volume,
+			customer_loss_rate,
+			freight_price,
+			delivery_lng,
+			delivery_lat,
+			arrive_lng,
+			arrive_lat,
+			start_rail_radius,
+			end_rail_radius
+
+		) VALUES
+		<foreach collection="list" item="item" separator=",">
+			(
+			#{item.tiDanHao},
+			#{item.ziTiDanHao},
+			#{item.ladingBillNo},
+			#{item.billSecret},
+			#{item.department},
+			#{item.organizationName},
+			#{item.status},
+			#{item.takeMode},
+			#{item.billDate},
+			#{item.storehouseType},
+			#{item.companyId},
+			#{item.companyCode},
+			#{item.companyName},
+			#{item.customerName},
+			#{item.customerContact},
+			#{item.customerPhone},
+			#{item.deliveryAddress},
+			#{item.latestLadingTime},
+			#{item.latestArriveTime},
+			#{item.remark},
+			#{item.storageName},
+			#{item.storageAddress},
+			#{item.materielName},
+			#{item.totalVolume},
+			#{item.customerLossRate},
+			#{item.freightPrice},
+			#{item.deliveryLng},
+			#{item.deliveryLat},
+			#{item.arriveLng},
+			#{item.arriveLat},
+			#{item.startRailRadius},
+			#{item.endRailRadius}
+			)
+		</foreach>
+		ON DUPLICATE KEY UPDATE
+		ti_dan_hao=ti_dan_hao,
+		zi_ti_dan_hao=zi_ti_dan_hao,
+		bill_secret = VALUES(bill_secret),
+		department = VALUES(department),
+		organization_name = VALUES(organization_name),
+		status = VALUES(status),
+		take_mode = VALUES(take_mode),
+		bill_date = VALUES(bill_date),
+		storehouse_type = VALUES(storehouse_type),
+		company_id = VALUES(company_id),
+		company_code = VALUES(company_code),
+		company_name = VALUES(company_name),
+		customer_name = VALUES(customer_name),
+		customer_contact = VALUES(customer_contact),
+		customer_phone = VALUES(customer_phone),
+		delivery_address = VALUES(delivery_address),
+		latest_lading_time = VALUES(latest_lading_time),
+		latest_arrive_time = VALUES(latest_arrive_time),
+		remark = VALUES(remark),
+		storage_name = VALUES(storage_name),
+		storage_address = VALUES(storage_address),
+		materiel_name = VALUES(materiel_name),
+		total_volume = VALUES(total_volume),
+		customer_loss_rate = VALUES(customer_loss_rate),
+		freight_price = VALUES(freight_price),
+		delivery_lng = VALUES(delivery_lng),
+		delivery_lat = VALUES(delivery_lat),
+		arrive_lng = VALUES(arrive_lng),
+		arrive_lat = VALUES(arrive_lat),
+		start_rail_radius = VALUES(start_rail_radius),
+		end_rail_radius = VALUES(end_rail_radius)
+	</insert>
+	
+	<update id="update">
+		UPDATE bill_lading 
+		<set>
+			<if test="tiDanHao != null and tiDanHao != ''">
+				ti_dan_hao = #{tiDanHao},
+			</if>
+			<if test="ziTiDanHao != null and ziTiDanHao != ''">
+				zi_ti_dan_hao = #{ziTiDanHao},
+			</if>
+			<if test="ladingBillNo != null and ladingBillNo != ''">
+				lading_bill_no = #{ladingBillNo},
+			</if>
+			<if test="billSecret != null and billSecret != ''">
+				bill_secret = #{billSecret},
+			</if>
+			<if test="department != null and department != ''">
+				department = #{department},
+			</if>
+			<if test="organizationName != null and organizationName != ''">
+				organization_name = #{organizationName},
+			</if>
+			<if test="status != null">
+				status = #{status},
+			</if>
+			<if test="takeMode != null">
+				take_mode = #{takeMode},
+			</if>
+			<if test="billDate != null and billDate != ''">
+				bill_date = #{billDate},
+			</if>
+			<if test="storehouseType != null">
+				storehouse_type = #{storehouseType},
+			</if>
+			<if test="companyId != null">
+				company_id = #{companyId},
+			</if>
+			<if test="companyCode != null and companyCode != ''">
+				company_code = #{companyCode},
+			</if>
+			<if test="companyName != null and companyName != ''">
+				company_name = #{companyName},
+			</if>
+			<if test="customerName != null and customerName != ''">
+				customer_name = #{customerName},
+			</if>
+			<if test="customerContact != null and customerContact != ''">
+				customer_contact = #{customerContact},
+			</if>
+			<if test="customerPhone != null and customerPhone != ''">
+				customer_phone = #{customerPhone},
+			</if>
+			<if test="deliveryAddress != null and deliveryAddress != ''">
+				delivery_address = #{deliveryAddress},
+			</if>
+			<if test="latestLadingTime != null and latestLadingTime != ''">
+				latest_lading_time = #{latestLadingTime},
+			</if>
+			<if test="latestArriveTime != null and latestArriveTime != ''">
+				latest_arrive_time = #{latestArriveTime},
+			</if>
+			<if test="remark != null and remark != ''">
+				remark = #{remark},
+			</if>
+			<if test="storageName != null and storageName != ''">
+				storage_name = #{storageName},
+			</if>
+			<if test="storageAddress != null and storageAddress != ''">
+				storage_address = #{storageAddress},
+			</if>
+			<if test="materielName != null and materielName != ''">
+				materiel_name = #{materielName},
+			</if>
+			<if test="totalVolume != null and totalVolume != ''">
+				total_volume = #{totalVolume},
+			</if>
+			<if test="customerLossRate != null and customerLossRate != ''">
+				customer_loss_rate = #{customerLossRate},
+			</if>
+			<if test="freightPrice != null and freightPrice != ''">
+				freight_price = #{freightPrice},
+			</if>
+			<if test="deliveryLng != null and deliveryLng != ''">
+				delivery_lng = #{deliveryLng},
+			</if>
+			<if test="deliveryLat != null and deliveryLat != ''">
+				delivery_lat = #{deliveryLat},
+			</if>
+			<if test="arriveLng != null and arriveLng != ''">
+				arrive_lng = #{arriveLng},
+			</if>
+			<if test="arriveLat != null and arriveLat != ''">
+				arrive_lat = #{arriveLat},
+			</if>
+			<if test="startRailRadius != null and startRailRadius != ''">
+				start_rail_radius = #{startRailRadius},
+			</if>
+			<if test="endRailRadius != null and endRailRadius != ''">
+				end_rail_radius = #{endRailRadius},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM bill_lading
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 二期添加sql -->
+
+	<!-- 通过提单密令获取提单信息 -->
+	<select id="getByBillSecret" resultType="BillLading">
+		SELECT
+		<include refid="billLadingColumns"/>
+		FROM bill_lading a
+		<include refid="billLadingJoins"/>
+		WHERE a.bill_secret = #{billSecret}
+	</select>
+
+	<!-- 分页查询运输委托单 -->
+	<select id="findList" resultType="BillLading">
+		SELECT
+		<include refid="billLadingColumns"/>
+		FROM bill_lading a
+		<include refid="billLadingJoins"/>
+		<where>
+			<if test="companyId != null">
+				AND a.company_id = #{companyId}
+			</if>
+			<if test="ladingBillNo != null and ladingBillNo != ''">
+				AND a.lading_bill_no LIKE
+				<if test="dbName == 'oracle'">'%'||#{ladingBillNo}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{ladingBillNo}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{ladingBillNo},'%')</if>
+			</if>
+			<if test="tiDanHao != null and tiDanHao != ''">
+				AND a.ti_dan_hao LIKE
+				<if test="dbName == 'oracle'">'%'||#{tiDanHao}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{tiDanHao}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{tiDanHao},'%')</if>
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+
+			<if test="takeMode != null">
+				AND take_mode = #{takeMode}
+			</if>
+			<if test="beginBillDate != null and endBillDate != null and beginBillDate != '' and endBillDate != ''">
+				AND a.bill_date BETWEEN #{beginBillDate} AND #{endBillDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.bill_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 获取运输委托单详情-->
+	<select id="get" resultType="BillLading">
+		SELECT
+		<include refid="billLadingColumns"/>
+		FROM bill_lading a
+		<include refid="billLadingJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<!-- 通过提单编号获取提单信息 -->
+	<select id="getByLadingNo" resultType="BillLading">
+		SELECT
+		<include refid="billLadingColumns"/>
+		FROM bill_lading a
+		<include refid="billLadingJoins"/>
+		WHERE a.lading_bill_no = #{ladingBillNo}
+	</select>
+
+</mapper>

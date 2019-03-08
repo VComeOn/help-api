@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.base.dao.SysAboutDao">
+    
+	<sql id="sysAboutColumns">
+		a.id AS "id",
+		a.about_us AS "aboutUs"
+	</sql>
+	
+	<sql id="sysAboutJoins">
+	</sql>
+    
+	<select id="get" resultType="SysAbout">
+		SELECT 
+			<include refid="sysAboutColumns"/>
+		FROM sys_about a
+		<include refid="sysAboutJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SysAbout">
+		SELECT 
+			<include refid="sysAboutColumns"/>
+		FROM sys_about a
+		<include refid="sysAboutJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SysAbout">
+		SELECT 
+			<include refid="sysAboutColumns"/>
+		FROM sys_about a
+		<include refid="sysAboutJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sys_about(
+			about_us
+		) VALUES (
+			#{aboutUs}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_about 
+		<set> 	
+			about_us = #{aboutUs},
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM sys_about
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

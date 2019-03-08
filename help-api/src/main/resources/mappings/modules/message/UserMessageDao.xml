@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.message.dao.UserMessageDao">
+    
+	<sql id="userMessageColumns">
+		a.id AS "id",
+		a.user_id AS "userId",
+		a.content AS "content",
+		a.create_date AS "createDate",
+		a.delivery_bill_no AS "deliveryBillNo",
+		a.driver_id AS "driverId",
+		a.is_read AS "isRead"
+	</sql>
+	
+	<sql id="userMessageJoins">
+	</sql>
+    
+	<select id="get" resultType="UserMessage">
+		SELECT 
+			<include refid="userMessageColumns"/>
+		FROM user_message a
+		<include refid="userMessageJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="UserMessage">
+		SELECT 
+			<include refid="userMessageColumns"/>
+		FROM user_message a
+		<include refid="userMessageJoins"/>
+		<where>
+			<if test="userId != null">
+				a.user_id = #{userId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="UserMessage">
+		SELECT 
+			<include refid="userMessageColumns"/>
+		FROM user_message a
+		<include refid="userMessageJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO user_message(
+			user_id,
+			content,
+			create_date,
+			delivery_bill_no,
+			driver_id,
+			is_read
+		) VALUES (
+			#{userId},
+			#{content},
+			#{createDate},
+			#{deliveryBillNo},
+			#{driverId},
+			#{isRead}
+		)
+	</insert>
+
+	<insert id="insertList" parameterType="list">
+		INSERT INTO user_message(
+			user_id,
+			content,
+			create_date,
+			delivery_bill_no,
+			driver_id,
+			is_read
+		) VALUES
+		<foreach collection="list" item="item" separator=",">
+			(
+			#{item.userId},
+			#{item.content},
+			#{item.createDate},
+			#{item.deliveryBillNo},
+			#{item.driverId},
+			#{item.isRead}
+			)
+		</foreach>
+	</insert>
+	
+	<update id="update">
+		UPDATE user_message 
+		<set> 	
+			<if test="userId != null and userId != ''">
+				user_id = #{userId},
+			</if>
+			<if test="content != null and content != ''">
+				content = #{content},
+			</if>
+			<if test="createDate != null and createDate != ''">
+				create_date = #{createDate},
+			</if>
+			<if test="deliveryBillNo != null and deliveryBillNo != ''">
+				delivery_bill_no = #{deliveryBillNo},
+			</if>
+			<if test="driverId != null">
+				driver_id = #{driverId},
+			</if>
+			<if test="isRead != null">
+				is_read = #{isRead},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<update id="setRead">
+		UPDATE user_message
+		<set>
+			is_read = 1
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM user_message
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

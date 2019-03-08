@@ -1,0 +1,715 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.bill.dao.BillDeliveryDao">
+    
+	<sql id="billDeliveryColumns">
+		a.id AS "id",
+		a.delivery_bill_no AS "deliveryBillNo",
+		a.lading_bill_no AS "ladingBillNo",
+		a.sign_quantity AS "signQuantity",
+		a.sign_date AS "signDate",
+		a.status AS "status",
+		a.driver_id AS "driverId",
+		a.plate_number AS "plateNumber",
+		a.company_id AS "companyId",
+		a.create_date AS "createDate",
+		a.start_delivery_date AS "startDeliveryDate",
+		a.end_delivery_date AS "endDeliveryDate",
+		a.will_quantity AS "willQuantity",
+		a.tare_weight AS "tareWeight",
+		a.gross_weight AS "grossWeight",
+		a.tank_no AS "tankNo",
+		a.shipper_name AS "shipperName",
+		a.is_balance AS "isBalance",
+		a.balance_user AS "balanceUser",
+		a.balance_date AS "balanceDate",
+		a.is_error_stop AS "isErrorStop",
+		a.is_close_app AS "isCloseApp",
+		a.is_admin_comment AS "isAdminComment",
+		a.is_customer_comment AS "isCustomerComment",
+		a.estimated_arrival_time AS "estimatedArrivalTime",
+		b.id AS "billLading.id",
+		b.department AS "billLading.department",
+		b.lading_bill_no AS "billLading.ladingBillNo",
+		b.organization_name AS "billLading.organizationName",
+		b.status AS "billLading.status",
+		b.take_mode AS "billLading.takeMode",
+		b.bill_date AS "billLading.billDate",
+		b.storehouse_type AS "billLading.storehouseType",
+		b.company_name AS "billLading.companyName",
+		b.customer_name AS "billLading.customerName",
+		b.customer_contact AS "billLading.customerContact",
+		b.customer_phone AS "billLading.customerPhone",
+		b.delivery_address AS "billLading.deliveryAddress",
+		b.latest_lading_time AS "billLading.latestLadingTime",
+		b.latest_arrive_time AS "billLading.latestArriveTime",
+		b.remark AS "billLading.remark",
+		b.storage_name AS "billLading.storageAddress",
+		b.materiel_name AS "billLading.materielName",
+		b.total_volume AS "billLading.totalVolume",
+		b.customer_loss_rate AS "billLading.customerLossRate",
+		b.freight_price AS "billLading.freightPrice",
+		b.delivery_lng AS "billLading.deliveryLng",
+		b.delivery_lat AS "billLading.deliveryLat",
+		b.arrive_lng AS "billLading.arriveLng",
+		b.arrive_lat AS "billLading.arriveLat",
+		b.start_rail_radius AS "billLading.startRailRadius",
+		b.end_rail_radius AS "billLading.endRailRadius",
+		b.ti_dan_hao AS "billLading.tiDanHao",
+		b.bill_secret AS "billLading.billSecret"
+	</sql>
+
+	<sql id="billDeliveryBaseColumns">
+		a.id AS "id",
+		a.delivery_bill_no AS "deliveryBillNo",
+		a.lading_bill_no AS "ladingBillNo",
+		a.sign_quantity AS "signQuantity",
+		a.sign_date AS "signDate",
+		a.status AS "status",
+		a.driver_id AS "driverId",
+		a.plate_number AS "plateNumber",
+		a.company_id AS "companyId",
+		a.create_date AS "createDate",
+		a.start_delivery_date AS "startDeliveryDate",
+		a.end_delivery_date AS "endDeliveryDate",
+		a.will_quantity AS "willQuantity",
+		a.tare_weight AS "tareWeight",
+		a.gross_weight AS "grossWeight",
+		a.tank_no AS "tankNo",
+		a.shipper_name AS "shipperName",
+		a.is_balance AS "isBalance",
+		a.balance_user AS "balanceUser",
+		a.balance_date AS "balanceDate",
+		a.is_error_stop AS "isErrorStop",
+		a.is_close_app AS "isCloseApp",
+		a.is_admin_comment AS "isAdminComment",
+		a.is_customer_comment AS "isCustomerComment",
+		a.estimated_arrival_time AS "estimatedArrivalTime"
+	</sql>
+
+	<sql id="billLadingColumns">
+		a.id AS "id",
+		a.delivery_bill_no AS "deliveryBillNo",
+		a.lading_bill_no AS "ladingBillNo",
+		a.sign_quantity AS "signQuantity",
+		a.sign_date AS "signDate",
+		a.status AS "status",
+		a.driver_id AS "driverId",
+		a.plate_number AS "plateNumber",
+		a.company_id AS "companyId",
+		a.create_date AS "createDate",
+		a.start_delivery_date AS "startDeliveryDate",
+		a.end_delivery_date AS "endDeliveryDate",
+		a.will_quantity AS "willQuantity",
+		a.tare_weight AS "tareWeight",
+		a.gross_weight AS "grossWeight",
+		a.tank_no AS "tankNo",
+		a.shipper_name AS "shipperName",
+		a.is_balance AS "isBalance",
+		a.balance_user AS "balanceUser",
+		a.balance_date AS "balanceDate",
+		a.is_error_stop AS "isErrorStop",
+		a.is_close_app AS "isCloseApp",
+		a.is_admin_comment AS "isAdminComment",
+		a.is_customer_comment AS "isCustomerComment",
+		a.estimated_arrival_time AS "estimatedArrivalTime",
+		b.id AS "id",
+		b.department AS "department",
+		b.lading_bill_no AS "ladingBillNo",
+		b.organization_name AS "organizationName",
+		b.status AS "status",
+		b.take_mode AS "takeMode",
+		b.bill_date AS "billDate",
+		b.storehouse_type AS "storehouseType",
+		b.company_name AS "companyName",
+		b.customer_contact AS "customerContact",
+		b.customer_name AS "customerName",
+		b.customer_phone AS "customerPhone",
+		b.delivery_address AS "deliveryAddress",
+		b.latest_lading_time AS "latestLadingTime",
+		b.latest_arrive_time AS "latestArriveTime",
+		b.remark AS "remark",
+		b.storage_name AS "storageAddress",
+		b.materiel_name AS "materielName",
+		b.total_volume AS "totalVolume",
+		b.customer_loss_rate AS "customerLossRate",
+		b.freight_price AS "freightPrice",
+		b.delivery_lng AS "deliveryLng",
+		b.delivery_lat AS "deliveryLat",
+		b.arrive_lng AS "arriveLng",
+		b.arrive_lat AS "arriveLat",
+		b.start_rail_radius AS "startRailRadius",
+		b.end_rail_radius AS "endRailRadius",
+		b.ti_dan_hao AS "tiDanHao"
+	</sql>
+	
+	<sql id="billDeliveryCommentColumn">
+		c.satisfaction_score AS "comment.satisfactionScore",
+		c.safe_score AS "comment.safeScore",
+		c.customer_score AS "comment.customerScore",
+		c.satisfaction_comment AS "comment.satisfactionComment",
+		c.safe_comment AS "comment.safeComment",
+		c.customer_comment AS "comment.customerComment",
+		c.satisfaction_time AS "comment.satisfactionTime",
+		c.safe_time AS "comment.safeTime",
+		c.customer_time AS "comment.customerTime"
+	</sql>
+	
+	<sql id="billDeliveryJoins">
+		LEFT JOIN bill_lading b ON a.lading_bill_no=b.lading_bill_no
+	</sql>
+
+	<sql id="billDeliveryCommentJoins">
+		LEFT JOIN bill_delivery_comment c ON a.id=c.delivery_id
+	</sql>
+
+	<sql id="billDeliveryDriverJoins">
+		LEFT JOIN base_driver d ON a.driver_id=d.id
+	</sql>
+
+	<sql id="billCarJoins">
+		LEFT JOIN base_car e ON a.plate_number=e.plate_number
+	</sql>
+
+	<select id="get" resultType="BillDelivery">
+		SELECT 
+			<include refid="billDeliveryColumns"/>
+			,d.name AS "driverName"
+		FROM bill_delivery a
+		<include refid="billDeliveryJoins"/>
+		<include refid="billDeliveryDriverJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="getInfoByDeliveryNo" resultType="BillDelivery">
+		SELECT
+		<include refid="billDeliveryColumns"/>
+		FROM bill_delivery a
+		<include refid="billDeliveryJoins"/>
+		WHERE a.delivery_bill_no=#{deliveryBillNo}
+	</select>
+
+
+	<!-- 根据运单编号获取运单基础信息 -->
+	<select id="getBaseInfoByDeliveryNo" resultType="BillDelivery">
+		SELECT
+			<include refid="billDeliveryBaseColumns"/>
+		FROM bill_delivery a
+		WHERE a.delivery_bill_no=#{deliveryBillNo}
+	</select>
+	<!-- 根据运单编号获取运单详细信息 -->
+	<select id="getByDeliveryNo" resultType="BillDelivery">
+		SELECT
+		<include refid="billDeliveryColumns"/>
+		,d.name AS "driverName"
+		,e.capacity AS "capacity"
+		FROM bill_delivery a
+		<include refid="billDeliveryJoins"/>
+		<include refid="billDeliveryDriverJoins"/>
+		<include refid="billCarJoins"/>
+		WHERE a.delivery_bill_no=#{deliveryBillNo}
+	</select>
+
+	<!-- 根据出库编号获取提单和出库单信息 -->
+	<select id="getByOutboundNo" resultType="BillLading">
+		SELECT
+		<include refid="billLadingColumns"/>
+		FROM bill_delivery a
+		<include refid="billDeliveryJoins"/>
+	<!--WHERE a.outbound_bill_no=#{outboundBillNo} -->
+</select>
+
+	<!-- 获取运单基础信息，以及最后一次开始运输的时间 -->
+	<select id="getDeliveryAndLastRunTime" resultType="BillDelivery">
+		SELECT
+		<include refid="billDeliveryBaseColumns"/>,
+		(SELECT b.run_time FROM driver_run_stop_record b WHERE b.delivery_bill_id=a.id ORDER BY run_time DESC LIMIT 1) AS 'lastRunDate'
+		FROM bill_delivery a
+		<where>
+			<if test="ladingBillNo != null and ladingBillNo != ''">
+				AND a.lading_bill_no = #{ladingBillNo}
+			</if>
+			<if test="status != null">
+				AND a.status = #{status}
+			</if>
+		</where>
+	</select>
+
+	<select id="findList" resultType="BillDelivery">
+		SELECT 
+			<include refid="billDeliveryColumns"/>
+		FROM bill_delivery a
+		<include refid="billDeliveryJoins"/>
+		<where>
+			<if test="ladingBillNo != null and ladingBillNo != ''">
+				AND a.lading_bill_no = #{ladingBillNo}
+			</if>
+			<if test="driverId != null">
+				AND a.driver_id = #{driverId}
+			</if>
+			<if test="status != null">
+				AND a.status = #{status}
+			</if>
+			<if test="isCloseApp != null">
+				AND a.is_close_app != #{isCloseApp}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 根据司机Id获取运单的列表信息 -->
+	<select id="getDeliveryBillByDeriverId" resultType="LadingBillVo">
+		SELECT
+		a.id AS "id",
+		a.lading_bill_no AS "ladingBillNo",
+		a.status AS "status",
+		a.start_delivery_date AS "startDeliveryDate",
+		b.delivery_address AS "deliveryAddress",
+		b.storage_name AS "storageAddress",
+		b.materiel_name AS "materielName",
+		b.ti_dan_hao AS "tiDanHao"
+		FROM bill_delivery a
+		<include refid="billDeliveryJoins"/>
+		<where>
+			<if test="driverId != null">
+				AND a.driver_id = #{driverId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 获取所有客户未评价的列表 -->
+	<select id="getNotCustomerCommentList" resultType="BillDelivery">
+		SELECT
+			<include refid="billDeliveryColumns"/>
+		FROM bill_delivery a
+		<include refid="billDeliveryJoins"/>
+		<where>
+			a.status = 8 AND a.is_customer_comment = 0
+		</where>
+	</select>
+
+	<!-- 通过提单号获取运单数量 -->
+	<select id="countByLading" resultType="int">
+		SELECT count(1) FROM bill_delivery a
+		<where>
+			<if test="ladingBillNo != null and ladingBillNo != ''">
+				AND a.lading_bill_no = #{ladingBillNo}
+			</if>
+			<if test="isBalance != null">
+				AND a.is_balance = #{isBalance}
+			</if>
+		</where>
+	</select>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO bill_delivery(
+			delivery_bill_no,
+			lading_bill_no,
+			sign_quantity,
+			sign_date,
+			status,
+			driver_id,
+			plate_number,
+			company_id,
+			create_date,
+			start_delivery_date,
+			end_delivery_date,
+			will_quantity,
+			tare_weight,
+			gross_weight,
+			tank_no,
+			shipper_name,
+			is_balance,
+			balance_user,
+			balance_date,
+			is_error_stop,
+			is_close_app,
+			is_admin_comment,
+			is_customer_comment,
+			estimated_arrival_time
+		) VALUES (
+			#{deliveryBillNo},
+			#{ladingBillNo},
+			#{signQuantity},
+			#{signDate},
+			#{status},
+			#{driverId},
+			#{plateNumber},
+			#{companyId},
+			#{createDate},
+			#{startDeliveryDate},
+			#{endDeliveryDate},
+			#{willQuantity},
+			#{tareWeight},
+			#{grossWeight},
+			#{tankNo},
+			#{shipperName},
+			#{isBalance},
+			#{balanceUser},
+			#{balanceDate},
+			#{isErrorStop},
+			#{isCloseApp},
+			#{isAdminComment},
+			#{isCustomerComment},
+			#{estimatedArrivalTime}
+		) <!--ON DUPLICATE KEY UPDATE outbound_bill_no=#{outboundBillNo};-->
+	</insert>
+
+	<update id="updateNo">
+		UPDATE bill_delivery SET
+		delivery_bill_no = #{deliveryBillNo},
+		start_delivery_date=null,
+		end_delivery_date=null
+		<if test="status != null">
+			,status = #{status}
+		</if>
+		WHERE id=#{id};
+	</update>
+
+	<update id="update">
+		UPDATE bill_delivery 
+		<set> 	
+			<if test="deliveryBillNo != null and deliveryBillNo != ''">
+				delivery_bill_no = #{deliveryBillNo},
+			</if>
+			<if test="ladingBillNo != null and ladingBillNo != ''">
+				lading_bill_no = #{ladingBillNo},
+			</if>
+			<if test="signQuantity != null and signQuantity != ''">
+				sign_quantity = #{signQuantity},
+			</if>
+			<if test="signDate != null and signDate != ''">
+				sign_date = #{signDate},
+			</if>
+			<if test="status != null">
+				status = #{status},
+			</if>
+			<if test="driverId != null">
+				driver_id = #{driverId},
+			</if>
+			<if test="plateNumber != null and plateNumber != ''">
+				plate_number = #{plateNumber},
+			</if>
+			<if test="companyId != null">
+				company_id = #{companyId},
+			</if>
+			<if test="startDeliveryDate != null">
+				start_delivery_date = #{startDeliveryDate},
+			</if>
+			<if test="endDeliveryDate != null">
+				end_delivery_date = #{endDeliveryDate},
+			</if>
+			<if test="createDate != null">
+				create_date = #{createDate},
+			</if>
+			<if test="willQuantity != null">
+				will_quantity = #{willQuantity},
+			</if>
+			<if test="tareWeight != null">
+				tare_weight = #{tareWeight},
+			</if>
+			<if test="grossWeight != null">
+				gross_weight = #{grossWeight},
+			</if>
+			<if test="tankNo != null and tankNo != ''">
+				tank_no = #{tankNo},
+			</if>
+			<if test="shipperName != null and shipperName != ''">
+				shipper_name = #{shipperName},
+			</if>
+			<if test="isErrorStop != null">
+				is_error_stop = #{isErrorStop},
+			</if>
+			<if test="isCloseApp != null">
+				is_close_app = #{isCloseApp},
+			</if>
+			<if test="isBalance != null">
+				is_balance = #{isBalance},
+			</if>
+			<if test="balanceUser != null">
+				balance_user = #{balanceUser},
+			</if>
+			<if test="balanceDate != null">
+				balance_date = #{balanceDate},
+			</if>
+			<if test="isAdminComment != null">
+				is_admin_comment = #{isAdminComment},
+			</if>
+			<if test="isCustomerComment != null">
+				is_customer_comment = #{isCustomerComment},
+			</if>
+			<if test="estimatedArrivalTime != null">
+				estimated_arrival_time = #{estimatedArrivalTime},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM bill_delivery
+		WHERE id = #{id}
+	</update>
+
+	<!-- 获取是否有运单正在使用该车辆 -->
+	<select id="countByPlateNumber" resultType="int">
+		SELECT count(1) FROM bill_delivery a WHERE a.plate_number = #{plateNumber} AND a.status in (1,2,4,5) AND a.id != #{id}
+	</select>
+
+
+	<!--                                            二期接口                                       -->
+
+	<!-- 通过车牌号和司机获取运输任务 -->
+	<select id="getDeliveryByDriverAndCar" resultType="BillDelivery">
+		SELECT
+			<include refid="billDeliveryBaseColumns"/>
+		FROM
+			bill_delivery a
+		<where>
+			<if test="driverId != null">
+				AND a.driver_id = #{driverId}
+			</if>
+			<if test="plateNumber != null">
+				AND a.plate_number = #{plateNumber}
+			</if>
+			AND a.status in (4,7,9)
+		</where>
+	</select>
+
+	<!-- 获取司机未完成的运单数 -->
+	<select id="countOnDeliveryBill" resultType="int">
+		SELECT count(1) FROM bill_delivery a
+		WHERE a.driver_id=#{driverId} AND a.status IN (3,4)
+	</select>
+
+	<!-- 通过提单编号获取所有运单信息 -->
+	<select id="getAllByLadingNo" resultType="BillDelivery">
+		SELECT
+		<include refid="billDeliveryBaseColumns"/>
+		,b.name AS "driverName"
+		,(SELECT case when sum(c.arrive_sign_quantity) is null then 0 else sum(c.arrive_sign_quantity) end FROM bill_delivery_sign c WHERE c.delivery_bill_no=a.delivery_bill_no) AS 'totalSign'
+		FROM bill_delivery a LEFT JOIN base_driver b ON  b.id = a.driver_id
+		WHERE a.lading_bill_no=#{ladingBillNo}
+	</select>
+
+
+	<!-- 首页获取司机所有运单-->
+	<select id="getAllocatOrTransitList" resultType="BillDelivery">
+		SELECT
+		<include refid="billDeliveryColumns"/>
+		,(SELECT COUNT(id) FROM bill_delivery_sign b WHERE b.delivery_bill_no=a.delivery_bill_no ) AS 'signCount'
+		,(SELECT case when sum(b.arrive_sign_quantity) is null then 0 else sum(b.arrive_sign_quantity) end FROM bill_delivery_sign b WHERE b.delivery_bill_no=a.delivery_bill_no) AS 'totalSign'
+		FROM bill_delivery a
+		<include refid="billDeliveryJoins"/>
+		<where>
+			<if test="driverId != null">
+				AND a.driver_id = #{driverId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 首页获取司机未完成的运输委托单-->
+	<select id="getHomeTransitList" resultType="BillDelivery">
+		SELECT
+		<include refid="billDeliveryColumns"/>
+		,(SELECT COUNT(id) FROM bill_delivery_sign b WHERE b.delivery_bill_no=a.delivery_bill_no ) AS 'signCount'
+		,(SELECT case when sum(b.arrive_sign_quantity) is null then 0 else sum(b.arrive_sign_quantity) end FROM bill_delivery_sign b WHERE b.delivery_bill_no=a.delivery_bill_no) AS 'totalSign'
+		FROM bill_delivery a
+		<include refid="billDeliveryJoins"/>
+		<where>
+			<if test="driverId != null">
+				AND a.driver_id = #{driverId}
+			</if>
+			AND  a.status IN (0,1,2,3,4,5,6,7,9)
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 获取执勤签到记录 -->
+	<select id="getSignDays" resultType="map">
+		SELECT CAST(DATE_FORMAT(a.day, '%e')  AS SIGNED) as 'day',(case when b.sign_date is not null then 1 else 0 end) as state FROM (
+		select * from (
+		select CONCAT(#{month},lpad(n.key,2,'0') ) day  from nums n where n.key &lt; 32) d where d.day &lt;= last_day(DATE_FORMAT('${month}01','%Y-%m-%d'))
+		) a LEFT JOIN (
+		SELECT DISTINCT DATE_FORMAT(sign_date,'%Y-%m-%d') as sign_date FROM bill_delivery WHERE driver_id=#{driverId} GROUP BY sign_date
+		) b ON a.day=b.sign_date ORDER BY day
+	</select>
+
+	<!-- 获取城市列表 -->
+	<select id="getCityList" resultType="map">
+		SELECT city,city_letter FROM sys_location WHERE grade=2 AND city != '' AND  city is not null ORDER BY city_letter ASC ;
+	</select>
+
+	<!-- 通过车牌号、司机、运输委托单号、状态判断是否可以绑定运输委托单 -->
+	<select id="getDeliveryByDriverAndCarAndLadingNo" resultType="BillDelivery">
+		SELECT
+		<include refid="billDeliveryBaseColumns"/>
+		FROM
+		bill_delivery a
+		<where>
+			<if test="driverId != null">
+				AND a.driver_id = #{driverId}
+			</if>
+			<if test="plateNumber != null and plateNumber !=''">
+				AND a.plate_number = #{plateNumber}
+			</if>
+			<if test="ladingBillNo != null and ladingBillNo !=''">
+				AND a.lading_bill_no = #{ladingBillNo}
+			</if>
+			AND a.status IN (0,1,3,4,7,9)
+		</where>
+	</select>
+
+	<!-- 通过车牌号、司机、运输委托单号、状态判断是否已发单 -->
+	<select id="getByLadingNoDriverCar" resultType="BillDelivery">
+		SELECT
+		<include refid="billDeliveryBaseColumns"/>
+		FROM bill_delivery a
+		WHERE a.lading_bill_no = #{ladingBillNo} AND a.driver_id = #{driverId} AND a.plate_number = #{plateNumber} AND a.status IN (0,1,2,3,4,5,6,7,9) order by a.create_date DESC
+	</select>
+
+	<!-- 通过车牌号、司机、运输委托单号、获取已接单的车辆任务 -->
+	<select id="getDriverHaveStatus3" resultType="BillDelivery">
+		SELECT
+		<include refid="billDeliveryBaseColumns"/>
+		FROM bill_delivery a
+		WHERE a.lading_bill_no = #{ladingBillNo} AND a.driver_id = #{driverId} AND a.plate_number = #{plateNumber} AND a.status = 3 order by a.create_date DESC
+	</select>
+
+	<!-- 通过车牌号、司机、运输委托单号、获取已发单的车辆任务 -->
+	<select id="getDriverHaveStatus" resultType="BillDelivery">
+		SELECT
+		<include refid="billDeliveryBaseColumns"/>
+		FROM bill_delivery a
+		WHERE a.lading_bill_no = #{ladingBillNo} AND a.driver_id = #{driverId} AND a.plate_number = #{plateNumber} AND a.status = 2 order by a.create_date DESC
+	</select>
+
+	<!-- 通过车牌号、司机、运输委托单号、状态判断已完成运输委托单 -->
+	<select id="getFinishByLadingNoDriverCar" resultType="BillDelivery">
+		SELECT
+		<include refid="billDeliveryBaseColumns"/>
+		FROM bill_delivery a
+		WHERE a.lading_bill_no = #{ladingBillNo} AND a.driver_id = #{driverId} AND a.plate_number = #{plateNumber} AND a.status = 8 order by a.create_date DESC
+	</select>
+
+	<!-- 获取运单详情以及运输委托单任务、评论 -->
+	<select id="getDetailById" resultType="BillDelivery">
+		SELECT
+		<include refid="billDeliveryColumns"/>
+		,<include refid="billDeliveryCommentColumn"/>
+		,(SELECT (case when sum(f.arrive_sign_quantity) is null THEN 0 ELSE sum(f.arrive_sign_quantity) END) FROM bill_delivery_sign f WHERE f.delivery_bill_no=a.delivery_bill_no) AS "totalSign"
+		,(SELECT COUNT(id) FROM bill_delivery_sign j WHERE j.delivery_bill_no=a.delivery_bill_no ) AS 'signCount'
+		,(SELECT  GROUP_CONCAT(g.arrive_sign_photo) FROM bill_delivery_sign g WHERE g.delivery_bill_no=a.delivery_bill_no) AS "signImageList"
+		,(SELECT  GROUP_CONCAT(h.img_urls) FROM driver_fault_record h WHERE h.delivery_bill_no=a.delivery_bill_no) AS "faultImageList"
+		FROM bill_delivery a
+		<include refid="billDeliveryJoins"/>
+		<include refid="billDeliveryCommentJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<!-- 管理端二期接口 -->
+	<!-- 获取运输委托单下所有运输任务 -->
+	<select id="findAllList" resultType="BillDelivery">
+		SELECT
+		<include refid="billDeliveryColumns"/>
+		,d.name AS "driverName"
+		FROM bill_delivery a
+		<include refid="billDeliveryDriverJoins"/>
+		<include refid="billDeliveryJoins"/>
+		<where>
+			<if test="ladingBillNo != null and ladingBillNo != ''">
+				AND a.lading_bill_no = #{ladingBillNo}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 获取累计司机提货量已签收数 -->
+	<select id="getTotalLadingQuantity" resultType="double">
+		SELECT
+			case when sum(a.arrive_sign_quantity) is null then 0 else sum(a.arrive_sign_quantity) end
+		FROM
+			bill_delivery_sign a
+		LEFT JOIN  bill_delivery b ON a.delivery_bill_no = b.delivery_bill_no
+
+		WHERE a.lading_bill_no = #{ladingBillNo} AND b.status=8 AND b.is_balance=1
+	</select>
+
+	<!-- 获取需要审核的任务列表 -->
+	<select id="findBillDeliveryExamine" resultType="BillDelivery">
+		SELECT
+		<include refid="billDeliveryColumns"/>
+		,d.name AS "driverName"
+		FROM bill_delivery a
+		<include refid="billDeliveryJoins"/>
+		<include refid="billDeliveryDriverJoins"/>
+		<where>
+			a.status = 0
+			<if test="companyId != null">
+				and a.company_id=#{companyId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+	<!--改变任务驳回通过状态-->
+	<update id="updateStatus">
+		UPDATE bill_delivery
+		<set>
+			status = #{status}
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<!--获取司机最新运输任务-->
+	<select id="getLastDelivery" resultType="BillDelivery">
+		SELECT
+		a.status AS 'status',
+		a.delivery_bill_no AS 'deliveryBillNo'
+		FROM bill_delivery a
+		WHERE
+		 	a.driver_id = #{driverId}
+		ORDER  BY a.create_date DESC LIMIT 1
+	</select>
+</mapper>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.driver.dao.UserFeedbackDao">
+    
+	<sql id="userFeedbackColumns">
+		a.id AS "id",
+		a.driver_id AS "driverId",
+		a.content AS "content",
+		a.create_date AS "createDate",
+		b.name as "driver.name",
+		b.phone as "driver.phone"
+	</sql>
+	
+	<sql id="userFeedbackJoins">
+		left join base_driver b on a.driver_id=b.id
+	</sql>
+    
+	<select id="get" resultType="UserFeedback">
+		SELECT 
+			<include refid="userFeedbackColumns"/>
+		FROM user_feedback a
+		<include refid="userFeedbackJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="UserFeedback">
+		SELECT 
+			<include refid="userFeedbackColumns"/>
+		FROM user_feedback a
+		<include refid="userFeedbackJoins"/>
+		<where>
+			
+			<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
+				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="UserFeedback">
+		SELECT 
+			<include refid="userFeedbackColumns"/>
+		FROM user_feedback a
+		<include refid="userFeedbackJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO user_feedback(
+			driver_id,
+			content,
+			create_date
+		) VALUES (
+			#{driverId},
+			#{content},
+			#{createDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE user_feedback 
+		<set> 	
+			<if test="driverId != null">
+				driver_id = #{driverId},
+			</if>
+			<if test="content != null and content != ''">
+				content = #{content},
+			</if>
+			<if test="createDate != null and createDate != ''">
+				create_date = #{createDate},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM user_feedback
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
