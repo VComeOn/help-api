@@ -47,37 +47,14 @@ public class LoginController extends BaseController{
     @Autowired
     private RedisUtils redisUtils;
 
-
     /**
-     * @description 注册-获取验证码
-     * @param
-     * @author wcf
-     * @date 2018/1/9
-     * @return
-     */
-    @RequestMapping("loginPwdValidCode")
-    @IgnoreSecurity
-    public Result loginPwdValidCode(@RequestParam(required = true) String phone){
-        BaseDriver driver = baseDriverService.getByPhone(phone);
-        if(driver != null){
-            return new Result(Global.ERROR_CODE, "该手机号已存在");
-        }
-        //String validCode = StringUtils.getRandomNumberByLength(6);
-        String validCode = "1234";
-        //SmsUtil.sendValidCodeSms(phone, validCode);
-        redisUtils.setValue(RedisUtils.PHONE_VALID_CODE + phone, validCode, Global.VALID_CODE_TIME);
-
-        return new Result(ResultStatusCode.OK);
-    }
-
-    /**
-     * @description 注册
+     * @description 新增车辆
      * @param
      * @author wcf
      * @date 2018/1/5
      * @return
      */
-    @RequestMapping("register")
+/*    @RequestMapping("register")
     @IgnoreSecurity
     public Result register(@Validated({EditPwdValid.class}) Account account){
         if(!account.getValidCode().equals(redisUtils.getValue(RedisUtils.PHONE_VALID_CODE + account.getPhone()))){
@@ -102,16 +79,16 @@ public class LoginController extends BaseController{
         //删除验证码
         redisUtils.delete(RedisUtils.PHONE_VALID_CODE + account.getPhone());
         return new Result(ResultStatusCode.OK);
-    }
+    }*/
 
 
 
     /**
      *
-     * @Description:手机号登陆--普通登陆
+     * @Description:救援车辆登陆--普通登陆
      * @return
-     * @author: wcf
-     * @date: 2017年7月6日
+     * @author: qj
+     * @date: 2019年3月13日
      */
     @RequestMapping("login")
     public Result login(@Validated({LoginValid.class}) Account account){
@@ -120,7 +97,7 @@ public class LoginController extends BaseController{
                 return new Result(ResultStatusCode.INVALID_CLIENTID, null);
             }
 
-            BaseDriver driver = baseDriverService.getByPhone(account.getAccount());
+            BaseDriver driver = baseDriverService.getBaseDriverByPlateNumber(account.getAccount());
 
             if(driver != null){
                 //一个用户同时只能有一台设备登录（用户端）
@@ -145,14 +122,14 @@ public class LoginController extends BaseController{
                     //cal.add(Calendar.MINUTE, +2);//用于测试，只有2分钟有效期
 
                     //拼装accessToken
-                    String accessToken = JwtHelper.createJWT(driver.getPhone(), driver.getId(),
+                    String accessToken = JwtHelper.createJWT(driver.getPlateNumber(), driver.getId(),
                             audience.getClientId(), audience.getName(),
                             cal.getTimeInMillis() - new Date().getTime(), audience.getBase64Secret());
                     //将该用户的access_token储存到redis服务器，保证一段时间内只能有一个有效的access_token
                     redisUtils.setToken(driver.getId(), accessToken, cal.getTimeInMillis() - new Date().getTime());
 
                     //获取refresh_token，有效期为7天，每次通过refresh_token获取access_token时，会刷新refresh_token的时间
-                    String refreshToken =  JwtHelper.creteaRefreshToken(driver.getPhone(), driver.getId(), audience.getClientId(), audience.getName(), audience.getBase64Secret());
+                    String refreshToken =  JwtHelper.creteaRefreshToken(driver.getPlateNumber(), driver.getId(), audience.getClientId(), audience.getName(), audience.getBase64Secret());
                     redisUtils.setRefreshToken(driver.getId(), refreshToken);
 
                     Map<String, Object> result = new HashMap<String, Object>();
@@ -230,12 +207,12 @@ public class LoginController extends BaseController{
                             cal.set(Calendar.HOUR_OF_DAY, 3);
 
                             //拼装accessToken
-                            String accessToken = JwtHelper.createJWT(driver.getPhone(), driver.getId(),
+                            String accessToken = JwtHelper.createJWT(driver.getPlateNumber(), driver.getId(),
                                     audience.getClientId(), audience.getName(),
                                     cal.getTimeInMillis() - new Date().getTime(), audience.getBase64Secret());
 
                             //获取refresh_token，有效期为7天，每次通过refresh_token获取access_token时，会刷新refresh_token的时间
-                            String refreshToken_new = JwtHelper.creteaRefreshToken(driver.getPhone(), driver.getId(),
+                            String refreshToken_new = JwtHelper.creteaRefreshToken(driver.getPlateNumber(), driver.getId(),
                                     audience.getClientId(), audience.getName(), audience.getBase64Secret());
 
                             result.put("access_token", "bearer" + accessToken);
@@ -255,53 +232,5 @@ public class LoginController extends BaseController{
         }catch(Exception e){
             return new Result(ResultStatusCode.SYSTEM_ERR.getCode(), ResultStatusCode.SYSTEM_ERR.getMsg(), null);
         }
-    }
-
-
-     /**
-      * @description 忘记密码-获取验证码
-      * @param
-      * @author wcf
-      * @date 2018/1/9
-      * @return
-      */
-    @RequestMapping("forgetPwdValidCode")
-    @IgnoreSecurity
-    public Result forgetPwdValidCode(@RequestParam(required = true) String phone){
-        BaseDriver driver = baseDriverService.getByPhone(phone);
-        if(driver == null){
-            return new Result(Global.ERROR_CODE, "该手机号不存在");
-        }
-        //String validCode = StringUtils.getRandomNumberByLength(6);
-        String validCode = "1234";
-        //SmsUtil.sendValidCodeSms(phone, validCode);
-        redisUtils.setValue(RedisUtils.PHONE_VALID_CODE + phone, validCode, Global.VALID_CODE_TIME);
-
-        return new Result(ResultStatusCode.OK);
-    }
-
-     /**
-      * @description 忘记密码-修改密码
-      * @param
-      * @author wcf
-      * @date 2018/1/5
-      * @return
-      */
-    @RequestMapping("forgetPwd")
-    @IgnoreSecurity
-    public Result forgetPwd(@Validated({EditPwdValid.class}) Account account){
-        if(!account.getValidCode().equals(redisUtils.getValue(RedisUtils.PHONE_VALID_CODE + account.getPhone()))){
-            return new Result(Global.ERROR_CODE, "验证码不正确");
-        }
-        BaseDriver driver = baseDriverService.getByPhone(account.getPhone());
-        if(driver == null){
-            return new Result(Global.ERROR_CODE, "该手机号不存在");
-        }
-        driver.setPwd(SystemService.entryptPassword(account.getNewPwd()));
-        baseDriverService.save(driver);
-        //删除验证码
-        redisUtils.delete(RedisUtils.PHONE_VALID_CODE + account.getPhone());
-
-        return new Result(ResultStatusCode.OK);
     }
 }

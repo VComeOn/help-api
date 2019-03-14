@@ -16,11 +16,11 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedisUtils {
 	
-	public static final String ACCESS_TOKEN = "TOKEN_WL_";//客户端请求服务器时携带的token参数
-	public static final String REFRESH_TOKEN = "REFRESH_WL_";//客户端用户刷新token的参数
+	public static final String ACCESS_TOKEN = "TOKEN_HP_";//客户端请求服务器时携带的token参数
+	public static final String REFRESH_TOKEN = "REFRESH_HP_";//客户端用户刷新token的参数
 	public static final String PHONE_VALID_CODE = "PHONE_VALID_CODE_";//客户端短信验证码
-	public static final String ADMIN_TOKEN = "ADMIN_TOKEN_";		//后台管理人员的token参数
-	public static final String ADMIN_REFRESH = "ADMIN_REFRESH_";	//后台管理人员的刷新token的参数
+	public static final String ADMIN_TOKEN = "ADMIN_TOKEN_HP_";		//后台管理人员的token参数
+	public static final String ADMIN_REFRESH = "ADMIN_REFRESH_HP_";	//后台管理人员的刷新token的参数
 
 	public static final String WAIT_DELIVERY_TRUCK = "WAIT_DELIVERY_TRUCK";		//即将出发车辆集合，格式：车牌号,运单号
 	public static final String WILL_ARRIVE_TRUCK = "WILL_ARRIVE_TRUCK";			//即将到达车辆集合

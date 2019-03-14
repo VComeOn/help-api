@@ -6,126 +6,26 @@
 		a.id AS "id",
 		a.head_img AS "headImg",
 		a.pwd AS "pwd",
-		a.name AS "name",
-		a.phone AS "phone",
-		a.company_id AS "companyId",
-		a.point AS "point",
-		a.point_total AS "pointTotal",
-		a.level AS "level",
 		a.is_on_duty AS "isOnDuty",
 		a.plate_number AS "plateNumber",
 		a.del_flag AS "delFlag",
-		a.last_sign_date AS "lastSignDate",
 		a.create_by AS "createBy.id",
 		a.create_date AS "createDate",
 		a.update_by AS "updateBy.id",
-		a.update_date AS "updateDate",
-		a.status AS "status",
-		a.card_id AS "cardId",
-		a.card_img_a AS "cardImgA",
-		a.card_img_b AS "cardImgB",
-		a.licence_id AS "licenceId",
-		a.licence_img_a AS "licenceImgA",
-		a.licence_img_b AS "licenceImgB",
-		a.certificate_id AS "certificateId",
-		a.certificate_img_a AS "certificateImgA",
-		a.certificate_img_b AS "certificateImgB",
-		b.name as "company.name"
+		a.update_date AS "updateDate"
 	</sql>
 	
 	<sql id="baseDriverJoins">
-		left join base_company b on a.company_id=b.id
 	</sql>
     
 	<!-- 通过手机号获取司机信息 -->
-	<select id="getByPhone" resultType="BaseDriver">
+	<select id="getBaseDriverByPlateNumber" resultType="BaseDriver">
 		SELECT
-		<include refid="baseDriverColumns"/>,
-		(case when (SELECT count(1) FROM driver_message c WHERE c.driver_id=a.id AND c.is_read=0) > 0 THEN 1 ELSE 0 END ) AS 'hasNewMessage'
+		<include refid="baseDriverColumns"/>
 		FROM base_driver a
-		<include refid="baseDriverJoins"/>
-		WHERE a.phone=#{phone}  AND a.del_flag=0
+		WHERE a.plate_number=#{plateNumber}  AND a.del_flag=0
 	</select>
-	<!-- app管理端，获取司机状态列表 -->
-	<!--<select id="getDriverStatusList" resultType="DriverVo">
-		SELECT * FROM (
-		(SELECT a.id,
-		a.head_img AS 'headImg',
-		a.name AS 'name',
-		c.name AS 'companyName',
-		NULL AS 'deliveryBillNo',
-		NULL AS 'status',
-		a.is_on_duty AS 'isOnDuty',
-		a.plate_number AS 'plateNumber',
-		'执勤' AS 'label',
-		NULL AS 'deliveryId',
-		a.last_sign_date AS 'deliveryCreateDate'
-		FROM base_driver a LEFT JOIN base_company c ON a.company_id=c.id
-		<where>
-			<if test="companyId != null">
-				a.company_id = #{companyId}
-			</if>
-			AND NOT EXISTS (SELECT b.id FROM bill_delivery b WHERE a.id=b.driver_id AND b.status != 0 AND b.status != 3)
-		</where>
-		)
-		UNION ALL
-		(SELECT a.id,
-		a.head_img AS 'headImg',
-		a.name AS 'name',
-		c.name AS 'companyName',
-		b.delivery_bill_no AS 'deliveryBillNo',
-		b.status AS 'status',
-		a.is_on_duty AS 'isOnDuty',
-		a.plate_number AS 'plateNumber',
-		(CASE WHEN b.id IS NULL AND a.is_on_duty = 1 THEN '执勤'
-		WHEN b.status = 1 THEN '已分配'
-		WHEN b.status = 2 THEN '运输中'
-		WHEN b.status = 3 THEN '已完成'
-		WHEN b.status = 4 THEN '中途停车'
-		WHEN b.status = 5 THEN '运输完成' END ) AS 'label',
-		b.id AS 'deliveryId',
-		b.create_date AS 'deliveryCreateDate'
-		FROM base_driver a LEFT JOIN (SELECT * FROM bill_delivery WHERE `status` != 0
-		<if test="companyId != null">
-			AND company_id = #{companyId}
-		</if>
-		) b
-		ON a.id=b.driver_id LEFT JOIN base_company c ON a.company_id=c.id
-		<where>
-			b.id IS NOT NULL
-			<if test="companyId != null">
-				AND a.company_id = #{companyId}
-			</if>
-			<if test="name != null and name != ''">
-				AND a.name LIKE
-				<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
-				<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
-				<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
-			</if>
 
-		</where>
-		)
-		) e
-		<where>
-			<if test="type != null">
-				<choose>
-					&lt;!&ndash; 未分配 &ndash;&gt;
-					<when test="type == 0">
-						AND e.deliveryId IS NULL
-					</when>
-					&lt;!&ndash; 已分配 &ndash;&gt;
-					<when test="type == 1">
-						AND e.status = 1
-					</when>
-					<when test="type == 2">
-						AND e.status IS NOT NULL AND e.status != 1 AND e.status != 3
-					</when>
-				</choose>
-			</if>
-		</where>
-
-		ORDER BY (CASE WHEN e.deliveryId IS NULL THEN 1 ELSE 0 END ) ASC ,e.deliveryCreateDate ASC
-	</select>-->
 
 	<select id="getDriverDetail" resultType="DriverDetailVo">
 		SELECT a.id AS "id",

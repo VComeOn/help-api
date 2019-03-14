@@ -16,7 +16,7 @@ import javax.validation.constraints.Size;
  */
 public class Account {
 
-    @NotEmpty(groups = LoginValid.class, message = "请填写手机号")
+    @NotEmpty(groups = LoginValid.class, message = "请填写车牌号")
     private String account;
     @NotEmpty(groups = LoginValid.class, message = "请填写密码")
     private String pwd;

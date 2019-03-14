@@ -20,60 +20,7 @@ import java.util.List;
 @MyBatisDao
 public interface BaseDriverDao extends CrudDao<BaseDriver> {
 
-    /**
-     * 通过手机号获取司机信息
-     * @param phone
-     * @return
-     */
-    BaseDriver getByPhone(String phone);
+    public BaseDriver getBaseDriverByPlateNumber(String plateNumber);
 
-    /**
-     * 解绑车辆
-     * @param driverId
-     * @return
-     */
-    int unbindCar(Integer driverId);
 
-    /**
-     * app管理端，获取司机状态列表
-     * @param vo
-     * @return
-     */
-    public List<DriverVo> getDriverStatusList(DriverVo vo);
-
-    /**
-     * 获取司机状态详情
-     * @param deliveryBillNo
-     * @param driverId
-     * @return
-     */
-    public DriverDetailVo getDriverDetail(@Param("deliveryBillNo") String deliveryBillNo, @Param("driverId") Integer driverId);
-
-    /**
-     * 绑定或者解绑车辆
-     * @param driver
-     * @return
-     */
-    public int bindOrUnbindCar(BaseDriver driver);
-
-    /**
-     * 获取需要审核的司机列表
-     * @return
-     */
-    public List<BaseDriver> finDriverExamine(BaseDriver baseDriver);
-
-    /**
-     * 改变司机驳回通过状态
-     * @param status
-     * @param id
-     * @return
-     */
-    public int updateStatus(@Param("status") Integer status,@Param("id") Integer id);
-
-    /**
-     * 绑定车辆
-     * @param driver
-     * @return
-     */
-    public int updateDuty(BaseDriver driver);
 }
